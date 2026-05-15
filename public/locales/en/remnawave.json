@@ -1495,7 +1495,8 @@
         "copy-the": "Copy the",
         "content-for-the-remnawave-node-below": "content for the Remnawave Node below.",
         "learn-more": "Learn more.",
-        "domain-or-ip": "Domain or IP"
+        "domain-or-ip": "Domain or IP",
+        "node-image": "Node image"
     },
     "create-node-step-3-status": {
         "establishing-mtls-connection": "Establishing mTLS connection...",

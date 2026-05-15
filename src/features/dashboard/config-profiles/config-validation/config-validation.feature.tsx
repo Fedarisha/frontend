@@ -28,6 +28,62 @@ const replaceSnippetsInArray = (array: any[], snippetsMap: Map<string, unknown>)
     }
 }
 
+// The bundled Xray WASM validator only knows upstream Xray protocols. Fedarisha
+// inbounds are validated by the backend and node, so use upstream placeholders
+// while checking the rest of the config in the browser.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const normalizeFedarishaProtocolsForXrayValidation = (config: any): void => {
+    if (Array.isArray(config.inbounds)) {
+        config.inbounds = config.inbounds.map((inbound: unknown, index: number) => {
+            if (
+                !inbound ||
+                typeof inbound !== 'object' ||
+                (inbound as { protocol?: unknown }).protocol !== 'fedarisha'
+            ) {
+                return inbound
+            }
+
+            const sourceInbound = inbound as { tag?: unknown }
+
+            return {
+                listen: '127.0.0.1',
+                port: 61000 + index,
+                protocol: 'dokodemo-door',
+                settings: {
+                    address: '127.0.0.1',
+                    network: 'tcp',
+                    port: 1
+                },
+                tag:
+                    typeof sourceInbound.tag === 'string' ? sourceInbound.tag : `fedarisha-${index}`
+            }
+        })
+    }
+
+    if (!Array.isArray(config.outbounds)) return
+
+    config.outbounds = config.outbounds.map((outbound: unknown, index: number) => {
+        if (
+            !outbound ||
+            typeof outbound !== 'object' ||
+            (outbound as { protocol?: unknown }).protocol !== 'fedarisha'
+        ) {
+            return outbound
+        }
+
+        const sourceOutbound = outbound as { tag?: unknown }
+
+        return {
+            protocol: 'freedom',
+            settings: {},
+            tag:
+                typeof sourceOutbound.tag === 'string'
+                    ? sourceOutbound.tag
+                    : `fedarisha-out-${index}`
+        }
+    })
+}
+
 export const ConfigValidationFeature = {
     validate: (
         editorRef: RefObject<editor.IStandaloneCodeEditor | null>,
@@ -65,6 +121,8 @@ export const ConfigValidationFeature = {
             if (clonedCurrentValue.routing?.balancers) {
                 replaceSnippetsInArray(clonedCurrentValue.routing.balancers, snippetsMap)
             }
+
+            normalizeFedarishaProtocolsForXrayValidation(clonedCurrentValue)
 
             const validationResult = window.XrayParseConfig(JSON.stringify(clonedCurrentValue))
 

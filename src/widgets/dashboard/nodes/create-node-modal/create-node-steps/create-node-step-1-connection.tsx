@@ -10,11 +10,12 @@ import {
     Text,
     TextInput
 } from '@mantine/core'
-import { TbCertificate, TbId, TbMapPin, TbWorld } from 'react-icons/tb'
+import { TbBrandDocker, TbCertificate, TbId, TbMapPin, TbWorld } from 'react-icons/tb'
 import { CreateNodeCommand } from '@remnawave/backend-contract'
 import { UseFormReturnType } from '@mantine/form'
 import { useTranslation } from 'react-i18next'
 import { PiArrowRight } from 'react-icons/pi'
+import { useState } from 'react'
 
 import { CopyableFieldShared } from '@shared/ui/copyable-field/copyable-field'
 import { COUNTRIES } from '@shared/ui/forms/nodes/base-node-form/constants'
@@ -31,6 +32,7 @@ interface IProps {
 
 export const CreateNodeStep1Connection = ({ form, onNext, pubKey, port }: IProps) => {
     const { t } = useTranslation()
+    const [nodeImage, setNodeImage] = useState('')
 
     const handleNext = async () => {
         const nameErrors = form.validateField('name')
@@ -146,10 +148,22 @@ export const CreateNodeStep1Connection = ({ form, onNext, pubKey, port }: IProps
                             w="25%"
                         />
                     </Group>
+
+                    <TextInput
+                        label={t('create-node-step-1-connection.node-image')}
+                        leftSection={<TbBrandDocker size={16} />}
+                        onChange={(event) => setNodeImage(event.currentTarget.value)}
+                        placeholder="remnawave/node:latest"
+                        size="sm"
+                        styles={{
+                            label: { fontWeight: 500 }
+                        }}
+                        value={nodeImage}
+                    />
                 </Stack>
 
                 <Stack gap="xs" mt="auto">
-                    <CopyDockerComposeWidget port={port} />
+                    <CopyDockerComposeWidget image={nodeImage} port={port} />
 
                     <Group justify="flex-end" mt="auto">
                         <Button

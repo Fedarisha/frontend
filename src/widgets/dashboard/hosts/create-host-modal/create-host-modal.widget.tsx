@@ -77,7 +77,9 @@ export const CreateHostModalWidget = () => {
     })
 
     const handleSubmit = form.onSubmit(async (values) => {
-        if (!values.inbound.configProfileInboundUuid || !values.inbound.configProfileUuid) {
+        const selectedInbound = values.inbound
+
+        if (!selectedInbound?.configProfileInboundUuid || !selectedInbound.configProfileUuid) {
             notifications.show({
                 title: t('create-host-modal.widget.error'),
                 message: t('create-host-modal.widget.please-select-the-config-profile-and-inbound'),
@@ -145,8 +147,8 @@ export const CreateHostModalWidget = () => {
                 xHttpExtraParams,
                 finalMask,
                 inbound: {
-                    configProfileInboundUuid: values.inbound.configProfileInboundUuid,
-                    configProfileUuid: values.inbound.configProfileUuid
+                    configProfileInboundUuid: selectedInbound.configProfileInboundUuid,
+                    configProfileUuid: selectedInbound.configProfileUuid
                 }
             }
         })
@@ -155,7 +157,7 @@ export const CreateHostModalWidget = () => {
     })
 
     form.watch('inbound.configProfileInboundUuid', ({ value }) => {
-        const { configProfileUuid } = form.getValues().inbound
+        const configProfileUuid = form.getValues().inbound?.configProfileUuid
         if (!configProfileUuid) {
             return
         }

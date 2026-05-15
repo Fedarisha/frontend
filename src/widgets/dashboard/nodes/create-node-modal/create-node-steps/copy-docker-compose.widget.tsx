@@ -6,10 +6,11 @@ import { PiCheck } from 'react-icons/pi'
 import { useGetPubKey } from '@shared/api/hooks'
 
 interface IProps {
+    image?: string
     port?: number
 }
 
-export const CopyDockerComposeWidget = ({ port }: IProps) => {
+export const CopyDockerComposeWidget = ({ image, port }: IProps) => {
     const { data: pubKey, isLoading: isPubKeyLoading } = useGetPubKey()
     const { t } = useTranslation()
 
@@ -17,12 +18,13 @@ export const CopyDockerComposeWidget = ({ port }: IProps) => {
         return <Skeleton height={40} />
     }
 
-    const generateDockerCompose = (port?: number) => {
+    const generateDockerCompose = (port?: number, image?: string) => {
+        const resolvedImage = image?.trim() || 'remnawave/node:latest'
         return `services:
   remnanode:
     container_name: remnanode
     hostname: remnanode
-    image: remnawave/node:latest
+    image: ${resolvedImage}
     network_mode: host
     restart: always
     cap_add:
@@ -38,7 +40,7 @@ export const CopyDockerComposeWidget = ({ port }: IProps) => {
 
     return (
         <Group mt="lg">
-            <CopyButton timeout={2000} value={generateDockerCompose(port)}>
+            <CopyButton timeout={2000} value={generateDockerCompose(port, image)}>
                 {({ copied, copy }) => (
                     <Button
                         color={copied ? 'teal' : 'gray'}

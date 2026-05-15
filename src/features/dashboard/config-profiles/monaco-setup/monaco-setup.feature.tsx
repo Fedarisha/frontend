@@ -12,6 +12,129 @@ import axios from 'axios'
 import { monacoTheme } from '@shared/constants/monaco-theme'
 import { app } from 'src/config'
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type JsonSchema = Record<string, any>
+
+const FEDARISHA_STORAGE_SCHEMA = {
+    additionalProperties: false,
+    properties: {
+        accessKey: { type: 'string' },
+        bucket: { type: 'string' },
+        endpoint: { type: 'string' },
+        localDir: { type: 'string' },
+        prefix: { type: 'string' },
+        region: { type: 'string' },
+        secretKey: { type: 'string' },
+        sessionsDir: { type: 'string' },
+        type: { type: 'string' }
+    },
+    title: 'FedarishaStorageConfig',
+    type: 'object'
+}
+
+const FEDARISHA_TUNING_SCHEMA = {
+    additionalProperties: false,
+    properties: {
+        idleTimeoutSec: { minimum: 0, type: 'integer' },
+        maxFileSizeBytes: { minimum: 0, type: 'integer' },
+        pollIntervalMs: { minimum: 0, type: 'integer' },
+        writeIntervalMs: { minimum: 0, type: 'integer' }
+    },
+    title: 'FedarishaTuningConfig',
+    type: 'object'
+}
+
+const FEDARISHA_USER_SCHEMA = {
+    additionalProperties: false,
+    properties: {
+        email: { type: 'string' },
+        id: { type: 'string' },
+        level: { minimum: 0, type: 'integer' }
+    },
+    title: 'FedarishaUser',
+    type: 'object'
+}
+
+const FEDARISHA_WEBHOOK_SCHEMA = {
+    additionalProperties: false,
+    properties: {
+        autoSetup: { type: 'boolean' },
+        enabled: { type: 'boolean' },
+        listen: { type: 'string' },
+        publicUrl: { type: 'string' },
+        tlsCert: { type: 'string' },
+        tlsKey: { type: 'string' }
+    },
+    title: 'FedarishaWebhookConfig',
+    type: 'object'
+}
+
+const FEDARISHA_INBOUND_SETTINGS_SCHEMA = {
+    additionalProperties: false,
+    properties: {
+        clients: {
+            items: FEDARISHA_USER_SCHEMA,
+            type: 'array'
+        },
+        storage: FEDARISHA_STORAGE_SCHEMA,
+        tuning: FEDARISHA_TUNING_SCHEMA,
+        userLevel: { minimum: 0, type: 'integer' },
+        webhook: FEDARISHA_WEBHOOK_SCHEMA
+    },
+    required: ['storage'],
+    title: 'FedarishaInboundConfigurationObject',
+    type: 'object'
+}
+
+const FEDARISHA_OUTBOUND_SETTINGS_SCHEMA = {
+    additionalProperties: false,
+    properties: {
+        storage: FEDARISHA_STORAGE_SCHEMA,
+        tuning: FEDARISHA_TUNING_SCHEMA,
+        userLevel: { minimum: 0, type: 'integer' }
+    },
+    required: ['storage'],
+    title: 'FedarishaOutboundConfigurationObject',
+    type: 'object'
+}
+
+const addConstVariant = (schema: JsonSchema | undefined, value: string) => {
+    if (!schema) return
+
+    if (Array.isArray(schema.anyOf)) {
+        if (!schema.anyOf.some((item: JsonSchema) => item.const === value)) {
+            schema.anyOf.push({ const: value })
+        }
+    }
+
+    if (Array.isArray(schema.enum) && !schema.enum.includes(value)) {
+        schema.enum.push(value)
+    }
+}
+
+const addAnyOfVariant = (schema: JsonSchema | undefined, variant: JsonSchema) => {
+    if (!schema) return
+
+    if (!Array.isArray(schema.anyOf)) {
+        schema.anyOf = []
+    }
+
+    if (!schema.anyOf.some((item: JsonSchema) => item.title === variant.title)) {
+        schema.anyOf.push(variant)
+    }
+}
+
+const patchFedarishaSchema = (schema: JsonSchema) => {
+    const definitions = schema.definitions
+    if (!definitions) return
+
+    addConstVariant(definitions.InboundObject?.properties?.protocol, 'fedarisha')
+    addConstVariant(definitions.OutboundObject?.properties?.protocol, 'fedarisha')
+
+    addAnyOfVariant(definitions.InboundConfigurationObject, FEDARISHA_INBOUND_SETTINGS_SCHEMA)
+    addAnyOfVariant(definitions.OutboundConfigurationObject, FEDARISHA_OUTBOUND_SETTINGS_SCHEMA)
+}
+
 export const MonacoSetupFeature = {
     setup: async (
         monaco: Monaco,
@@ -32,6 +155,7 @@ export const MonacoSetupFeature = {
 
             const response = await axios.get(jsonSchemaUrl)
             const schema = await response.data
+            patchFedarishaSchema(schema)
 
             const snippetDescriptions = snippets.map((snippet) => {
                 const snippetJson = JSON.stringify(snippet.snippet, null, 1)
@@ -98,6 +222,7 @@ export const MonacoSetupSnippetsFeature = {
 
             const response = await axios.get(jsonSchemaUrl)
             const schema = await response.data
+            patchFedarishaSchema(schema)
 
             const snippetArraySchema = {
                 $schema: 'http://json-schema.org/draft-07/schema#',
