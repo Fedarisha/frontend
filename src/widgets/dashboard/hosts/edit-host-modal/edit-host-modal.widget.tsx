@@ -1,18 +1,16 @@
 import { UpdateHostCommand } from '@remnawave/backend-contract'
 import { zodResolver } from 'mantine-form-zod-resolver'
-import { notifications } from '@mantine/notifications'
 import { memo, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { PiListChecks } from 'react-icons/pi'
-import { modals } from '@mantine/modals'
 import { useForm } from '@mantine/form'
 import { Drawer } from '@mantine/core'
 import consola from 'consola/browser'
 
 import {
     QueryKeys,
-    useCreateHost,
     useGetConfigProfiles,
+    useGetHostTags,
     useGetInternalSquads,
     useGetNodes,
     useGetSubscriptionTemplates,
@@ -21,7 +19,6 @@ import {
 import { MODALS, useModalClose, useModalState } from '@entities/dashboard/modal-store'
 import { BaseOverlayHeader } from '@shared/ui/overlays/base-overlay-header'
 import { BaseHostForm } from '@shared/ui/forms/hosts/base-host-form'
-import { cloneString } from '@shared/utils/misc/clone-string'
 import { queryClient } from '@shared/api'
 
 export const EditHostModalWidget = memo(() => {
@@ -36,6 +33,7 @@ export const EditHostModalWidget = memo(() => {
     const { data: nodes } = useGetNodes()
     const { data: templates } = useGetSubscriptionTemplates()
     const { data: internalSquads } = useGetInternalSquads()
+    const { data: hostTags } = useGetHostTags()
 
     const form = useForm<UpdateHostCommand.Request>({
         name: 'edit-host-form',
@@ -61,17 +59,6 @@ export const EditHostModalWidget = memo(() => {
     }
 
     const { mutate: updateHost, isPending: isUpdateHostPending } = useUpdateHost({
-        mutationFns: {
-            onSuccess: async () => {
-                handleClose()
-                await queryClient.refetchQueries({
-                    queryKey: QueryKeys.hosts.getAllTags.queryKey
-                })
-            }
-        }
-    })
-
-    const { mutate: createHost } = useCreateHost({
         mutationFns: {
             onSuccess: async () => {
                 handleClose()
@@ -134,14 +121,16 @@ export const EditHostModalWidget = memo(() => {
                 muxParams: muxParamsParsed,
                 sockoptParams: sockoptParamsParsed,
                 finalMask: finalMaskParsed,
-                tag: host.tag ?? undefined,
+                tags: host.tags ?? undefined,
                 isHidden: host.isHidden,
                 overrideSniFromAddress: host.overrideSniFromAddress,
                 keepSniBlank: host.keepSniBlank,
                 vlessRouteId: host.vlessRouteId ?? undefined,
-                allowInsecure: host.allowInsecure ?? undefined,
+                pinnedPeerCertSha256: host.pinnedPeerCertSha256 ?? undefined,
+                verifyPeerCertByName: host.verifyPeerCertByName ?? undefined,
                 shuffleHost: host.shuffleHost ?? undefined,
                 mihomoX25519: host.mihomoX25519 ?? undefined,
+                mihomoIpVersion: host.mihomoIpVersion ?? undefined,
                 nodes: host.nodes ?? undefined,
                 xrayJsonTemplateUuid: host.xrayJsonTemplateUuid ?? undefined,
                 excludedInternalSquads: host.excludedInternalSquads ?? undefined,
@@ -164,31 +153,6 @@ export const EditHostModalWidget = memo(() => {
                 'port',
                 configProfile.inbounds.find((inbound) => inbound.uuid === value)?.port ?? undefined
             )
-        }
-    })
-
-    form.watch('allowInsecure', ({ value }) => {
-        if (value === true) {
-            modals.openConfirmModal({
-                title: t('edit-host-modal.widget.are-you-sure'),
-                children: t(
-                    'edit-host-modal.widget.allowing-insecure-connections-can-lead-to-security-risks-we-do-not-recommend-enabling-this-option'
-                ),
-                centered: true,
-                labels: {
-                    confirm: t('edit-host-modal.widget.proceed'),
-                    cancel: t('edit-host-modal.widget.cancel')
-                },
-                confirmProps: {
-                    color: 'red'
-                },
-                onConfirm: () => {
-                    form.setFieldValue('allowInsecure', true)
-                },
-                onCancel: () => {
-                    form.setFieldValue('allowInsecure', false)
-                }
-            })
         }
     })
 
@@ -258,60 +222,10 @@ export const EditHostModalWidget = memo(() => {
                 xHttpExtraParams,
                 muxParams,
                 sockoptParams,
-                finalMask,
-                tag: values.tag === '' ? null : values.tag
+                finalMask
             }
         })
     })
-
-    const handleCloneHost = () => {
-        if (!host) {
-            return
-        }
-
-        if (!host.inbound.configProfileInboundUuid || !host.inbound.configProfileUuid) {
-            notifications.show({
-                title: t('edit-host-modal.widget.error'),
-                message: t('edit-host-modal.widget.dangling-host-cannot-be-cloned'),
-                color: 'red'
-            })
-
-            return
-        }
-
-        createHost({
-            variables: {
-                ...host,
-                remark: cloneString(host.remark),
-                port: host.port,
-
-                isDisabled: true,
-                path: host.path ?? undefined,
-                sni: host.sni ?? undefined,
-                host: host.host ?? undefined,
-                alpn: (host.alpn as UpdateHostCommand.Request['alpn']) ?? undefined,
-                xHttpExtraParams: host.xHttpExtraParams ?? undefined,
-                muxParams: host.muxParams ?? undefined,
-                fingerprint:
-                    (host.fingerprint as UpdateHostCommand.Request['fingerprint']) ?? undefined,
-                inbound: {
-                    configProfileUuid: host.inbound.configProfileUuid,
-                    configProfileInboundUuid: host.inbound.configProfileInboundUuid
-                },
-                serverDescription: host.serverDescription ?? undefined,
-                sockoptParams: host.sockoptParams ?? undefined,
-                tag: host.tag ?? undefined,
-                overrideSniFromAddress: host.overrideSniFromAddress,
-                keepSniBlank: host.keepSniBlank,
-                vlessRouteId: host.vlessRouteId ?? undefined,
-                allowInsecure: host.allowInsecure ?? undefined,
-                nodes: host.nodes ?? undefined,
-                xrayJsonTemplateUuid: host.xrayJsonTemplateUuid ?? undefined,
-                excludedInternalSquads: host.excludedInternalSquads ?? undefined,
-                finalMask: host.finalMask ?? undefined
-            }
-        })
-    }
 
     return (
         <Drawer
@@ -338,8 +252,8 @@ export const EditHostModalWidget = memo(() => {
                     advancedOpened={advancedOpened}
                     configProfiles={configProfiles?.configProfiles ?? []}
                     form={form}
-                    handleCloneHost={handleCloneHost}
                     handleSubmit={handleSubmit}
+                    hostTags={hostTags?.tags ?? []}
                     internalSquads={internalSquads?.internalSquads ?? []}
                     isSubmitting={isUpdateHostPending}
                     nodes={nodes!}

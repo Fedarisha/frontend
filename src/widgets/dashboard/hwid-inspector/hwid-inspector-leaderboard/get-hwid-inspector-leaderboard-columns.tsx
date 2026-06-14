@@ -34,7 +34,7 @@ export function getHwidInspectorLeaderboardColumns(
                     <ActionIcon
                         onClick={() => handleViewUser(userUuid)}
                         size="input-sm"
-                        variant="light"
+                        variant="soft"
                     >
                         <PiUserCircle size="1.5rem" />
                     </ActionIcon>

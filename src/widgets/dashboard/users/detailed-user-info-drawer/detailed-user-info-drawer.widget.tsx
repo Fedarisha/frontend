@@ -255,7 +255,7 @@ export const DetailedUserInfoDrawerWidget = () => {
                                     value={user.trojanPassword}
                                 />
                                 <CopyableFieldShared
-                                    label={t('detailed-user-info-drawer.widget.vless-uuid')}
+                                    label="Vless/Hysteria2 UUID"
                                     value={user.vlessUuid}
                                 />
                                 <CopyableFieldShared

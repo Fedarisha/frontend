@@ -9,6 +9,7 @@ import dayjs from 'dayjs'
 import { NodesStatisticSparklineCardWidget } from '@widgets/dashboard/nodes-statistic/statistic-sparkline-card'
 import { NodesStatisticBarchartWidget } from '@widgets/dashboard/nodes-statistic/statistic-barchart'
 import { TopLeaderboardCardShared } from '@shared/ui/leaderboard-item-card'
+import { getDefaultDateRange } from '@shared/utils/time-utils'
 import { CountryFlag } from '@shared/ui/get-country-flag'
 import { useGetStatsNodesUsage } from '@shared/api/hooks'
 import { Page, PageHeaderShared } from '@shared/ui'
@@ -29,21 +30,17 @@ const TOP_NODES_LIMIT_OPTIONS = [
 
 const DEFAULT_TOP_NODES_LIMIT = 20
 
-const DEFAULT_DATE_RANGE = {
-    start: dayjs().subtract(6, 'day').format('YYYY-MM-DD'),
-    end: dayjs().format('YYYY-MM-DD')
-}
-
 export const StatisticNodesPage = () => {
     const { t, i18n } = useTranslation()
+    const defaultRange = getDefaultDateRange()
 
     const [rawRange, setRawRange] = useState<[null | string, null | string]>([
-        DEFAULT_DATE_RANGE.start,
-        DEFAULT_DATE_RANGE.end
+        defaultRange.start,
+        defaultRange.end
     ])
 
     const [topNodesLimit, setTopNodesLimit] = useState<number>(DEFAULT_TOP_NODES_LIMIT)
-    const [queryRange, setQueryRange] = useState<{ end: string; start: string }>(DEFAULT_DATE_RANGE)
+    const [queryRange, setQueryRange] = useState<{ end: string; start: string }>(defaultRange)
 
     const {
         data: nodesStats,
@@ -63,8 +60,8 @@ export const StatisticNodesPage = () => {
 
     const handleDateRangeChange = (value: DatesRangeValue<string>) => {
         if (value[0] === null && value[1] === null) {
-            setRawRange([DEFAULT_DATE_RANGE.start, DEFAULT_DATE_RANGE.end])
-            setQueryRange(DEFAULT_DATE_RANGE)
+            setRawRange([defaultRange.start, defaultRange.end])
+            setQueryRange(defaultRange)
             return
         }
 

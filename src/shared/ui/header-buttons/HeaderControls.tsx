@@ -8,6 +8,7 @@ import { VersionControl } from './VersionControl'
 import { GithubControl } from './GithubControl'
 import { LogoutControl } from './LogoutControl'
 import { RecapControl } from './RecapControl'
+import { PrimeControl } from './PrimeControl'
 
 interface HeaderControlsProps extends BoxProps {
     githubLink?: string
@@ -17,6 +18,7 @@ interface HeaderControlsProps extends BoxProps {
     withGithub?: boolean
     withLanguage?: boolean
     withLogout?: boolean
+    withPrime?: boolean
     withRecap?: boolean
     withRefresh?: boolean
     withSupport?: boolean
@@ -34,6 +36,7 @@ export function HeaderControls({
     withLanguage = true,
     withVersion = true,
     withRecap = false,
+    withPrime = false,
     telegramLink,
     stars,
     isGithubLoading,
@@ -42,6 +45,7 @@ export function HeaderControls({
     return (
         <Group gap="xs" {...others}>
             {withTelegram && <TelegramControl link={telegramLink} />}
+            {withPrime && <PrimeControl />}
             {withSupport && <SupportControl />}
 
             {withVersion && <VersionControl />}

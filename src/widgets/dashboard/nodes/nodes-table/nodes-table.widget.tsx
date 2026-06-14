@@ -14,14 +14,15 @@ import { memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useStat
 import { arrayMove, SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable'
 import { GetAllNodesCommand } from '@remnawave/backend-contract'
 import { useWindowVirtualizer } from '@tanstack/react-virtual'
-import { useListState, useMediaQuery } from '@mantine/hooks'
 import { restrictToVerticalAxis } from '@dnd-kit/modifiers'
-import { Box, Container, em, Stack } from '@mantine/core'
+import { Box, Container, Stack } from '@mantine/core'
+import { useListState } from '@mantine/hooks'
 
 import { MODALS, useModalsStoreOpenWithData } from '@entities/dashboard/modal-store'
 import { nodesQueryKeys, useGetNodes, useReorderNodes } from '@shared/api/hooks'
 import { EmptyPageLayout } from '@shared/ui/layouts/empty-page'
 import { sToMs } from '@shared/utils/time-utils'
+import { useIsMobile } from '@shared/hooks'
 import { queryClient } from '@shared/api'
 
 import { NodesSpotlightSearchWidget } from '../nodes-spotlight-search'
@@ -41,7 +42,7 @@ export const NodesTableWidget = memo((props: IProps) => {
     const [scrollMargin, setScrollMargin] = useState(0)
     const listRef = useRef<HTMLDivElement | null>(null)
     const prevStateRef = useRef(state)
-    const isMobile = useMediaQuery(`(max-width: ${em(768)})`)
+    const isMobile = useIsMobile()
 
     useGetNodes({
         rQueryParams: {

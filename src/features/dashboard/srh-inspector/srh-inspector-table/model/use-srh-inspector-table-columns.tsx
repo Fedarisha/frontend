@@ -1,6 +1,6 @@
 /* eslint-disable camelcase */
 import { GetSubscriptionRequestHistoryCommand } from '@remnawave/backend-contract'
-import { MRT_ColumnDef } from 'mantine-react-table'
+import { MRT_ColumnDef } from '@kastov/mantine-react-table-open'
 import { useTranslation } from 'react-i18next'
 import { useMemo } from 'react'
 import dayjs from 'dayjs'
@@ -15,10 +15,10 @@ export const useSrhInspectorTableColumns = () => {
     >(
         () => [
             {
-                accessorKey: 'id',
-                header: 'ID',
-                accessorFn: (originalRow) => originalRow.id,
-                size: 80
+                accessorKey: 'userId',
+                header: 'User ID',
+                accessorFn: (originalRow) => originalRow.userId,
+                size: 130
             },
             {
                 accessorKey: 'requestIp',
@@ -29,7 +29,7 @@ export const useSrhInspectorTableColumns = () => {
                 accessorKey: 'userAgent',
                 header: t('use-srh-inspector-table-columns.user-agent'),
                 accessorFn: (originalRow) => originalRow.userAgent || '–',
-                size: 500
+                size: 400
             },
             {
                 accessorKey: 'requestAt',
@@ -44,10 +44,10 @@ export const useSrhInspectorTableColumns = () => {
                 }
             },
             {
-                accessorKey: 'userUuid',
-                header: t('use-srh-inspector-table-columns.user-uuid'),
-                accessorFn: (originalRow) => originalRow.userUuid || '–',
-                size: 300
+                accessorKey: 'id',
+                header: 'ID',
+                accessorFn: (originalRow) => originalRow.id,
+                size: 80
             }
         ],
         [t]

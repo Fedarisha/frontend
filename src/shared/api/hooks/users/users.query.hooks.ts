@@ -4,6 +4,7 @@ import {
     GetConnectionKeysByUuidCommand,
     GetUserAccessibleNodesCommand,
     GetUserByUuidCommand,
+    GetUserMetadataCommand,
     GetUserSubscriptionRequestHistoryCommand
 } from '@remnawave/backend-contract'
 import { createQueryKeys } from '@lukemorales/query-key-factory'
@@ -32,6 +33,9 @@ export const usersQueryKeys = createQueryKeys('users', {
     getUserSubscriptionRequestHistory: (
         route: GetUserSubscriptionRequestHistoryCommand.Request
     ) => ({
+        queryKey: [route]
+    }),
+    getUserMetadata: (route: GetUserMetadataCommand.RequestParams) => ({
         queryKey: [route]
     })
 })
@@ -104,4 +108,14 @@ export const useGetConnectionKeysByUuid = createGetQueryHook({
         staleTime: sToMs(4)
     },
     errorHandler: (error) => errorHandler(error, 'Get Connection Keys By UUID')
+})
+
+export const useGetUserMetadata = createGetQueryHook({
+    endpoint: GetUserMetadataCommand.TSQ_url,
+    responseSchema: GetUserMetadataCommand.ResponseSchema,
+    routeParamsSchema: GetUserMetadataCommand.RequestParamsSchema,
+    getQueryKey: ({ route }) => usersQueryKeys.getUserMetadata(route!).queryKey,
+    rQueryParams: {
+        staleTime: sToMs(60)
+    }
 })

@@ -19,15 +19,17 @@ import {
     PiWarningCircle
 } from 'react-icons/pi'
 import { GetOneNodeCommand, UpdateNodeCommand } from '@remnawave/backend-contract'
-import { TbPower, TbWifi, TbWifiOff } from 'react-icons/tb'
+import { TbJson, TbPower, TbWifi, TbWifiOff } from 'react-icons/tb'
+import { githubDarkTheme, JsonEditor } from 'json-edit-react'
 import { memo, useCallback, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
+import { modals } from '@mantine/modals'
 
 import { GetActiveSessionsOnNodeFeature } from '@features/ui/dashboard/nodes/get-active-sesions-on-node'
+import { QueryKeys, useDisableNode, useEnableNode, useGetNodeMetadata } from '@shared/api/hooks'
 import { GetNodeLinkedHostsFeature } from '@features/ui/dashboard/nodes/get-node-linked-hosts'
 import { GetNodeUsersUsageFeature } from '@features/ui/dashboard/nodes/get-node-users-usage'
 import { getNodeResetDaysUtil, getXrayUptimeUtil } from '@shared/utils/time-utils'
-import { QueryKeys, useDisableNode, useEnableNode } from '@shared/api/hooks'
 import { BaseOverlayHeader } from '@shared/ui/overlays/base-overlay-header'
 import { prettyBytesToAnyUtil } from '@shared/utils/bytes'
 import { SectionCard } from '@shared/ui/section-card'
@@ -58,6 +60,9 @@ export const NodeDetailsCardWidget = memo((props: IProps) => {
         }
     }
 
+    const { data: metadata, isLoading: isMetadataLoading } = useGetNodeMetadata({
+        route: { uuid: node.uuid }
+    })
     const { mutate: disableNode, isPending: isDisableNodePending } = useDisableNode(mutationParams)
     const { mutate: enableNode, isPending: isEnableNodePending } = useEnableNode(mutationParams)
 
@@ -250,6 +255,50 @@ export const NodeDetailsCardWidget = memo((props: IProps) => {
 
             <SectionCard.Section>
                 <Group gap="xs" justify="flex-end">
+                    <Group gap="xs" justify="center">
+                        <Tooltip label="Metadata">
+                            <ActionIcon
+                                color="teal"
+                                disabled={!metadata}
+                                loading={isMetadataLoading}
+                                onClick={() => {
+                                    if (!metadata) return
+                                    modals.open({
+                                        centered: true,
+                                        size: 'auto',
+                                        title: (
+                                            <BaseOverlayHeader
+                                                iconColor="teal"
+                                                IconComponent={TbJson}
+                                                iconVariant="soft"
+                                                title="Metadata"
+                                            />
+                                        ),
+                                        children: (
+                                            <Box>
+                                                <JsonEditor
+                                                    collapse={3}
+                                                    data={metadata.metadata as object}
+                                                    indent={4}
+                                                    maxWidth="100%"
+                                                    rootName=""
+                                                    theme={githubDarkTheme}
+                                                    viewOnly
+                                                />
+                                            </Box>
+                                        )
+                                    })
+                                }}
+                                size="lg"
+                                variant="soft"
+                            >
+                                <TbJson size={22} />
+                            </ActionIcon>
+                        </Tooltip>
+                    </Group>
+
+                    <Divider opacity={0.3} orientation="vertical" />
+
                     <Group gap="xs" justify="center">
                         <GetNodeLinkedHostsFeature nodeUuid={node.uuid} />
                     </Group>

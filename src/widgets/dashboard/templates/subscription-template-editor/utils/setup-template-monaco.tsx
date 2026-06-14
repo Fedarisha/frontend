@@ -26,7 +26,7 @@ function buildMarkdownDescription(host: Host): string {
         `| **Status** | ${icon} ${label} |`
     ]
 
-    if (host.tag) rows.push(`| **Tag** | \`${host.tag}\` |`)
+    if (host.tags.length > 0) rows.push(`| **Tags** | \`${host.tags.join(', ')}\` |`)
     if (host.sni) rows.push(`| **SNI** | \`${host.sni}\` |`)
     if (host.serverDescription) rows.push(`| **Description** | ${host.serverDescription} |`)
     if (host.inbound.configProfileUuid) {
@@ -51,7 +51,9 @@ export const configureMonaco = (
                 enableSchemaRequest: true,
                 hover: true,
                 completion: true,
-                format: true
+                format: {
+                    enable: true
+                }
             })
         }
 

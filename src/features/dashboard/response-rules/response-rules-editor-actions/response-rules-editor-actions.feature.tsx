@@ -25,7 +25,7 @@ import {
     Textarea
 } from '@mantine/core'
 import { PiCheck, PiCheckSquareOffset, PiCopy, PiFloppyDisk } from 'react-icons/pi'
-import { useClipboard, useDisclosure, useMediaQuery } from '@mantine/hooks'
+import { useClipboard, useDisclosure } from '@mantine/hooks'
 import { notifications } from '@mantine/notifications'
 import { useTranslation } from 'react-i18next'
 import { modals } from '@mantine/modals'
@@ -35,6 +35,7 @@ import { useDownloadTemplate } from '@shared/ui/load-templates/use-download-temp
 import { QueryKeys, useUpdateSubscriptionSettings } from '@shared/api/hooks'
 import { BaseOverlayHeader } from '@shared/ui/overlays/base-overlay-header'
 import { useToken } from '@entities/auth/session-store/use-session-store'
+import { useIsMobile } from '@shared/hooks'
 import { queryClient } from '@shared/api'
 
 import { Props } from './interfaces'
@@ -54,7 +55,7 @@ export function ResponseRulesEditorActionsFeature(props: Props) {
     const { t } = useTranslation()
     const token = useToken()
 
-    const isMobile = useMediaQuery('(max-width: 48em)')
+    const isMobile = useIsMobile()
     const clipboard = useClipboard({ timeout: 500 })
     const [opened, handlers] = useDisclosure(false)
 

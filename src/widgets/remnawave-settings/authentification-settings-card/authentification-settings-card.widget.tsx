@@ -34,6 +34,7 @@ import { BaseOverlayHeader } from '@shared/ui/overlays/base-overlay-header'
 import { SettingsCardShared } from '@shared/ui/settings-card'
 import { PocketidLogo, YandexLogo } from '@shared/ui/logos'
 import { QueryKeys } from '@shared/api/hooks/keys-factory'
+import { TagInputPill } from '@shared/ui/tag-input-pill'
 import { handleFormErrors } from '@shared/utils/misc'
 import { queryClient } from '@shared/api'
 
@@ -337,6 +338,9 @@ export const AuthentificationSettingsCardWidget = (props: IProps) => {
                                         placeholder={fieldConfig.placeholder}
                                         splitChars={[',', ' ', ';']}
                                         {...form.getInputProps(formPath)}
+                                        renderPill={({ value, onRemove }) => (
+                                            <TagInputPill onRemove={onRemove} value={value} />
+                                        )}
                                     />
                                 )
                             }

@@ -78,7 +78,9 @@ export function MainLayout() {
                                 stars={remnawaveInfo.starsCount || undefined}
                                 telegramLink="https://t.me/remnawave"
                                 withGithub={!isSocialButton}
+                                withPrime
                                 withRecap={!isSocialButton}
+                                withRefresh={!isSocialButton}
                                 withSupport={!isSocialButton}
                                 withTelegram={!isSocialButton}
                             />

@@ -10,8 +10,8 @@ import {
 } from 'react-icons/tb'
 import { PiCheck, PiCheckSquareOffset, PiCopy, PiFloppyDisk } from 'react-icons/pi'
 import { ActionIcon, Button, CopyButton, Group, Menu, Text } from '@mantine/core'
-import { useClipboard, useDisclosure, useMediaQuery } from '@mantine/hooks'
 import { UpdateConfigProfileCommand } from '@remnawave/backend-contract'
+import { useClipboard, useDisclosure } from '@mantine/hooks'
 import { notifications } from '@mantine/notifications'
 import { useTranslation } from 'react-i18next'
 import { modals } from '@mantine/modals'
@@ -27,6 +27,7 @@ import { KeypairGeneratorWidget } from '@widgets/dashboard/config-profiles/keypa
 import { useDownloadTemplate } from '@shared/ui/load-templates/use-download-template'
 import { BaseOverlayHeader } from '@shared/ui/overlays/base-overlay-header'
 import { QueryKeys, useUpdateConfigProfile } from '@shared/api/hooks'
+import { useIsMobile } from '@shared/hooks'
 import { queryClient } from '@shared/api'
 
 import classes from './config-editor-actions.module.css'
@@ -47,7 +48,7 @@ export function ConfigEditorActionsFeature(props: Props) {
     } = props
     const { t } = useTranslation()
 
-    const isMobile = useMediaQuery('(max-width: 48em)')
+    const isMobile = useIsMobile()
     const clipboard = useClipboard({ timeout: 500 })
 
     const { isOpen } = useModalState(MODAL_KEY)

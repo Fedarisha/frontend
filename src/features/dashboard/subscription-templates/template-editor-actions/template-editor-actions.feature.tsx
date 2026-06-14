@@ -9,15 +9,16 @@ import {
     TbSelectAll
 } from 'react-icons/tb'
 import { GetSubscriptionTemplateCommand } from '@remnawave/backend-contract'
-import { useClipboard, useDisclosure, useMediaQuery } from '@mantine/hooks'
 import { PiCheckSquareOffset, PiFloppyDisk } from 'react-icons/pi'
 import { ActionIcon, Button, Group, Menu } from '@mantine/core'
+import { useClipboard, useDisclosure } from '@mantine/hooks'
 import { useTranslation } from 'react-i18next'
 import { encode } from '@stablelib/base64'
 import { RefObject } from 'react'
 
 import { useDownloadTemplate } from '@shared/ui/load-templates/use-download-template'
 import { QueryKeys, useUpdateSubscriptionTemplate } from '@shared/api/hooks'
+import { useIsMobile } from '@shared/hooks'
 import { queryClient } from '@shared/api'
 
 import classes from './template-editor-actions.module.css'
@@ -32,7 +33,7 @@ export function TemplateEditorActionsFeature(props: Props) {
     const { editorRef, editorType, template } = props
     const { t } = useTranslation()
 
-    const isMobile = useMediaQuery('(max-width: 48em)')
+    const isMobile = useIsMobile()
     const clipboard = useClipboard({ timeout: 500 })
     const [opened, handlers] = useDisclosure(false)
 

@@ -1,12 +1,22 @@
+import { GetInternalSquadsCommand } from '@remnawave/backend-contract'
 import { Checkbox, Stack, Text, TextInput } from '@mantine/core'
 import { useVirtualizer } from '@tanstack/react-virtual'
 import { TbCirclesRelation } from 'react-icons/tb'
 import { useTranslation } from 'react-i18next'
+import { Key, memo, useRef } from 'react'
 import { PiEmpty } from 'react-icons/pi'
-import { memo, useRef } from 'react'
 
 import { InternalSquadCheckboxCard } from '../internal-squad-checkbox-card'
-import { IProps } from './interfaces'
+
+export interface IProps {
+    description?: string
+    filteredInternalSquads: GetInternalSquadsCommand.Response['response']['internalSquads']
+    formKey: Key | null | undefined
+    hideEditButton?: boolean
+    label?: string
+    searchQuery: string
+    setSearchQuery: (value: string) => void
+}
 
 export const InternalSquadsListWidget = memo((props: IProps) => {
     const {

@@ -60,7 +60,9 @@
         "nothing-found": "未找到",
         "name": "名称",
         "clone": "克隆",
-        "event-sent": "发送事件"
+        "event-sent": "发送事件",
+        "open": "打开",
+        "color": "颜色"
     },
     "bandwidth-metrics": {
         "current-year": "今年",
@@ -153,7 +155,8 @@
         "internal-squads": "内部分组",
         "first-connected-at": "首次连接于",
         "sub-last-opened-at": "上次订阅时间",
-        "tag": "Tag"
+        "tag": "Tag",
+        "used-traffic": "已使用的流量(%)"
     },
     "header-buttons": {
         "feature": {}
@@ -210,11 +213,7 @@
         "widget": {
             "edit-host": "编辑主机",
             "dangling-host-cannot-be-cloned": "同名主机不能被克隆",
-            "error": "错误",
-            "are-you-sure": "您确定吗？",
-            "allowing-insecure-connections-can-lead-to-security-risks-we-do-not-recommend-enabling-this-option": "允许不安全的连接会导致安全风险。我们不建议启用此选项。",
-            "proceed": "继续",
-            "cancel": "取消"
+            "error": "错误"
         }
     },
     "hosts-page-header": {
@@ -298,7 +297,7 @@
             "traffic-reset-strategy": "流量重置策略",
             "traffic-reset-strategy-description": "用户流量使用统计应多久重置一次",
             "data-limit": "流量限制",
-            "data-limit-description": "输入流量限制 GB（0 表示无限制）",
+            "data-limit-description": "输入流量限制 GiB（0 表示无限制）",
             "username-cannot-be-changed-later": "用户名之后无法更改",
             "loading-user-creation": "正在加载创建用户窗口..",
             "create-user": "创建用户",
@@ -394,7 +393,7 @@
         "please-ensure-you-provide-a-valid-json-mux-object": "请确保您提供一个有效的 JSON MUX 对象。",
         "for-more-information-refer-to": "欲了解更多信息，请参阅",
         "xtls-documentation": "XTLS 文档",
-        "final-mask-description": "The finalMask override allows you to fine-tune the finalMask in cases where the server-side and client-side finalMask configurations need to differ.<br/><br/>FinalMask will only be applied to Xray-JSON and Base64 client output formats.<br/><br/>Make sure to review the <anchor>Xray documentation</anchor>.",
+        "final-mask-description": "最终伪装层覆写允许您在服务器端和客户端的 finalMask 配置需要不同时，对最终伪装层进行微调。<br/><br/>FinalMask 将仅适用于Xray-JSON和Base64客户端。<br/><br/>请务必审阅 <anchor>Xray 文档</anchor>。",
         "paste-default-mux-params": "粘贴默认的 Mux 参数",
         "please-ensure-you-provide-a-valid-json-sockopt-object": "请确保您提供一个有效的 JSON Sockopt 对象。",
         "paste-default-sockopt-params": "粘贴默认 Sockopt 参数",
@@ -414,7 +413,6 @@
         "override-sni-from-address": "从地址覆盖SNI地址",
         "override-sni-from-address-description": "此选项用指定的地址字段值替换SNI值。这对于多域配置或通配符域配置特别有用。",
         "legacy-options": "传统选项",
-        "allow-insecure": "允许不安全的连接",
         "shuffled-hosts-hover-card": "随机排序的主机将放置在列表的顶端。",
         "vless-route-description": "从 1 到 65535，0 或留空以禁用",
         "misc-settings": "杂项设置",
@@ -445,7 +443,6 @@
         "internal-name-placeholder": "例如：US-NY-Node-01 ",
         "address": "地址",
         "e-g-example-com": "例如 example.com",
-        "consumption-multiplier": "流量倍率",
         "traffic-tracking": "跟踪流量使用",
         "limit": "限制",
         "reset-day": "重置日期",
@@ -471,6 +468,25 @@
             "short-stats": "简要统计",
             "remnawave-usage": "Remnawave 使用情况",
             "process-details": "进程详情"
+        },
+        "runtime-info": {
+            "title": "运行时指标指南",
+            "subtitle": "运行时卡片上每个数值的实际含义",
+            "intro": "每张卡片都展示了一个 <highlight>Remnawave 进程</highlight> 的实时状态快照。可通过本说明了解每项指标的含义，以及在什么情况下需要关注或排查问题。",
+            "instance-types-title": "进程类型",
+            "instance-types-description": "Remnawave 被拆分为多个专门化进程。每个进程都有各自独立的职责、内存空间以及事件循环",
+            "api-description": "负责处理来自仪表盘以及订阅接口的所有 HTTP 请求。这是系统中<highlight>主要面向用户的核心进程</highlight> —— 几乎所有面板操作和订阅请求都会由这里进行处理。",
+            "scheduler-description": "一个由 <highlight>cron 定时任务驱动的调度器</highlight>。它本身并不执行任何实际工作 —— 在设定的时间点，它只会向队列中推送一个任务，随后由 <highlight>Processor</highlight> 处理该任务。",
+            "processor-description": "实际运行任务的 <highlight>worker</highlight>。它负责消费队列中的任务，并执行大量耗时操作，例如 <highlight>节点健康检查</highlight>、按用户和节点进行的 <highlight>流量聚合统计</highlight>，以及其他不能阻塞 API 的长时间运行任务。",
+            "memory-description": "进程中用于存放其运行时工作数据的内存区域。所有数值均由 Node.js 实时采集并报告。",
+            "heap-description": "由 <highlight>V8</highlight>-Node.js 引擎管理的 JavaScript 对象所使用的内存。显示格式为 <highlight>已使用 / 总量</highlight>。较高的占用比例通常是<highlight>正常且健康的</highlight> —— V8 会尽可能保留已申请的内存，直到确实需要更多内存时才继续扩容，因此像 <highlight>100 / 120 MB</highlight> 这样的数值是正常现象，并不代表内存告警。",
+            "rss-description": "<highlight>驻留集大小 </highlight> —— 操作系统实际分配给该进程的总物理内存，包括堆内存、本地代码以及共享库。它是判断<highlight>该进程实际占用了多少 RAM 内存</highlight>的最佳单一指标。",
+            "external-description": "由绑定到 JavaScript 的原生 C++ 对象在 V8 之外持有的内存。常见来源包括 <highlight>已打开的 socket</highlight>、<highlight>流（streams）</highlight>以及基于 Buffer 的数据负载。",
+            "array-buffers-description": "专门分配给 <highlight>ArrayBuffer</highlight> 和 <highlight>Buffer</highlight> 实例的内存（用于原始二进制数据）。这部分内存属于 <highlight>External</highlight> 内存的一个子集。",
+            "event-loop-description": "驱动 Node.js 中所有异步工作的单线程事件循环的健康状态。如果该循环被阻塞，整个进程将会停滞。",
+            "delay-description": "连续两次事件循环 tick 之间的平均间隔时间。健康状态通常接近 <highlight>0–2 毫秒</highlight>。数值越高，通常意味着事件循环正被较长时间的同步任务阻塞。",
+            "p99-description": "测量时间窗口内事件循环延迟的 <highlight>99 百分位</highlight>。它能够反映平均值所掩盖的最坏情况延迟，对于发现偶发性的延迟尖峰非常有用。",
+            "active-handles-description": "保持事件循环持续运行的长期资源，例如 <highlight>已打开的 socket 连接</highlight>、<highlight>定时器</highlight> 以及 <highlight>文件描述符</highlight>。数量在稳定范围内通常属于正常现象；若出现<highlight>持续无上限增长</highlight>，则往往是资源泄漏的重要信号。"
         }
     },
     "login-form": {
@@ -524,8 +540,7 @@
         "column": {
             "monthly": "每月",
             "weekly": "周",
-            "daily": "日",
-            "monthly-rolling": "按月(滚动)"
+            "daily": "日"
         }
     },
     "get-time-ago": {
@@ -617,8 +632,15 @@
             "set-port": "设置端口",
             "port": "端口",
             "clear-selection": "清除选择",
-            "select-all": "全选"
+            "select-all": "全选",
+            "dangling-hosts-skipped": "已跳过 {{count}} 个未关联的主机，未执行克隆。"
         }
+    },
+    "edit-many-hosts-drawer": {
+        "confirm-title": "确认批量更新",
+        "confirm-description": "以下字段将应用于 {{count}} 个主机:",
+        "no-changes-title": "无需更新",
+        "no-changes-description": "您尚未修改任何字段。"
     },
     "bulk-user-actions-drawer": {
         "widget": {
@@ -690,10 +712,8 @@
                     "perform-action-on-users": "对 {{usersCount}} 位选定用户执行操作",
                     "resets-the-traffic-usage-to-zero-for-all-selected-users": "将所有选定用户的流量使用重置为0",
                     "revokes-subscription-for-all-selected-users": "撤销所有选定用户的订阅",
-                    "change-active-internal-squads": "更改激活的内部分组",
                     "specify-internal-squads-that-will-be-assigned-to-the-user": "指定将分配给用户的内部小组",
                     "internal-squads": "内部分组",
-                    "changes-the-active-internal-squads-for-all-selected-users": "更改所有选中用户的活跃内部分组",
                     "extend-expiration-date": "延长日期",
                     "enter-the-number-of-days-to-extend-the-expiration-date": "输入延长到期日的天数",
                     "extend-days": "延长天数",
@@ -821,7 +841,6 @@
             "revoked-at": "撤销于",
             "connection-information": "连接信息",
             "trojan-password": "Trojan 密码",
-            "vless-uuid": "VLESS UUID",
             "ss-password": "SS 密码",
             "last-online": "最后在线",
             "last-connected-node": "最后连接节点",
@@ -899,8 +918,8 @@
             "total-traffic-prettybytestoanyutil": "总流量: {{totalTraffic}}",
             "user": "用户",
             "traffic": "流量",
-            "no-users-with-traffic-100-kb": "没有流量 ≥ 100 KB 的用户",
-            "users-hidden-with-less-than-100-kb": "{{usersCount}} 个流量小于 100 KB 的用户已隐藏 (总计 {{totalTraffic}})"
+            "no-users-with-traffic-100-kb": "流量 ≥ 100 KiB 的用户",
+            "users-hidden-with-less-than-100-kb": "{{usersCount}} 个流量小于 100 KiB 的用户已隐藏 (总计 {{totalTraffic}})"
         }
     },
     "get-hwid-user-devices": {
@@ -1258,6 +1277,17 @@
             "filter-by-tags": "按标签进行筛选"
         }
     },
+    "disclaimer-overlay": {
+        "title": "免责声明",
+        "subtitle": "请在您继续之前阅读此消息。",
+        "intro": "Remnawave 是一款<highlight>开源、自托管</highlight>的代理和用户管理工具。其提供方式为<warning>“按现状提供（As Is）”，不附带任何形式的保证，无论是明示还是默示保证</warning>。",
+        "responsibility": "您需对本软件的部署和使用方式承担全部责任。",
+        "compliance": "您必须遵守所在司法管辖区适用的所有法律法规。",
+        "liability": "开发者和贡献者对任何误用、损害或数据丢失均不承担任何责任。",
+        "license-acknowledgement": "继续操作即表示您已阅读并同意<anchor>许可协议条款</anchor>。",
+        "accept-button": "我已了解并接受",
+        "shown-once": "此通知只显示一次。"
+    },
     "mobile-warning-overlay": {
         "mobile-device-detected": "检测到移动设备",
         "description-line-1": "此页面包含复杂的表格，可能不适合在移动设备上使用。",
@@ -1496,7 +1526,8 @@
         "content-for-the-remnawave-node-below": "以下是 Remnawave 节点的内容。",
         "learn-more": "了解更多。",
         "domain-or-ip": "域名或IP",
-        "node-image": "节点镜像"
+        "node-image": "节点镜像",
+        "additional-options": "附加参数"
     },
     "create-node-step-3-status": {
         "establishing-mtls-connection": "正在建立mTLS连接...",
@@ -1541,7 +1572,7 @@
     },
     "external-squads-grid": {
         "widget": {
-            "no-external-squads": "暂无内部分组",
+            "no-external-squads": "暂无外部分组",
             "no-external-squads-line-1": "额外分组允许您为特定用户组自定义设置。",
             "no-external-squads-line-2": "你可以覆盖每个分组的默认订阅模板和其他设置。",
             "no-external-squads-line-3": "创建一个分组并指定用户应用自定义配置。"
@@ -1987,7 +2018,9 @@
             "plugin": "插件",
             "review-documentation-for-more-information": "查看文件以获取更多信息。",
             "nothing-found": "未找到任何信息…",
-            "select-plugin": "选择插件"
+            "select-plugin": "选择插件",
+            "proxy-url": "代理 URL",
+            "proxy-url-description": "可选。如果填写此项，面板与节点之间的内部 API 连接将通过该代理转发。"
         }
     },
     "node-plugin-card": {
@@ -2130,6 +2163,52 @@
         "widget": {
             "history": "历史",
             "providers": "服务商"
+        }
+    },
+    "prime-modal": {
+        "shared": {
+            "description": "支持项目并成为核心成员——更贴近团队、产品路线以及实际工作",
+            "priority-support-title": "优先支持",
+            "priority-support-description": "跳过排队——你的问题将优先得到团队的直接解答",
+            "private-community-title": "私密社群",
+            "private-community-description": "仅限 Prime 会员参与的专属社群",
+            "shape-the-roadmap-title": "参与路线规划",
+            "shape-the-roadmap-description": "投票决定下一个开发的内容，并帮助引导项目的发展方向。",
+            "direct-developer-access-title": "开发者直接访问",
+            "direct-developer-access-description": "直接联系开发者-没有工单，没有中间人。",
+            "join-button": "加入最棒的RW"
+        }
+    },
+    "hosts-datatable": {
+        "widget": {
+            "reset-sort": "重置排序"
+        }
+    },
+    "columns-visibility-popover": {
+        "show-all": "显示全部",
+        "hide-all": "隐藏全部"
+    },
+    "use-hosts-table-widget": {
+        "disabled": "已禁用",
+        "enabled": "已启用",
+        "hidden": "已隐藏"
+    },
+    "node-tracking-and-billing": {
+        "card": {
+            "note": "备注"
+        }
+    },
+    "node-consumption": {
+        "card": {
+            "node-consumption-multiplier-1": "将所选倍率应用于节点流量（1.0 = 正常，0.5 = 一半，2.0 = 双倍）。",
+            "node-consumption-multiplier-2": "主要用于在启用流量统计时准确显示流量配额。节点流量倍率不会影响详细统计数据（图表）的显示。",
+            "node-consumption-multiplier": "节点流量倍率",
+            "user-consumption-multiplier": "用户流量倍率"
+        }
+    },
+    "keypair-generator": {
+        "widget": {
+            "generate": "生成"
         }
     }
 }

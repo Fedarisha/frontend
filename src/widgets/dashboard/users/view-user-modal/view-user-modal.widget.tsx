@@ -1,7 +1,6 @@
-import { useMediaQuery } from '@mantine/hooks'
 import { useTranslation } from 'react-i18next'
 import { IconUser } from '@tabler/icons-react'
-import { em, Modal } from '@mantine/core'
+import { Modal } from '@mantine/core'
 import { motion } from 'motion/react'
 
 import {
@@ -13,6 +12,7 @@ import { useBulkUsersActionsStoreActions } from '@entities/dashboard/users/bulk-
 import { BaseOverlayHeader } from '@shared/ui/overlays/base-overlay-header'
 import { LoaderModalShared } from '@shared/ui/loader-modal'
 import { usersQueryKeys } from '@shared/api/hooks'
+import { useIsMobile } from '@shared/hooks'
 import { queryClient } from '@shared/api'
 
 import { ViewUserModalContent } from './view-user-modal.content'
@@ -25,7 +25,7 @@ export const ViewUserModal = () => {
     const bulkUsersActionsStoreActions = useBulkUsersActionsStoreActions()
     const selectedUser = useUserModalStoreUserUuid()
 
-    const isMobile = useMediaQuery(`(max-width: ${em(768)})`)
+    const isMobile = useIsMobile()
 
     const handleClose = () => {
         bulkUsersActionsStoreActions.resetState()

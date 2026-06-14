@@ -1,6 +1,5 @@
 import { Split } from '@gfazioli/mantine-split-pane'
 import { useTranslation } from 'react-i18next'
-import { useMediaQuery } from '@mantine/hooks'
 import { useLayoutEffect } from 'react'
 import { Stack } from '@mantine/core'
 import { motion } from 'motion/react'
@@ -10,17 +9,22 @@ import { CreateInfraBillingNodeModalWidget } from '@widgets/dashboard/infra-bill
 import { CreateInfraProviderDrawerWidget } from '@widgets/dashboard/infra-billing/create-infra-provider-drawer/create-infra-provider.drawer.widget'
 import { InfraBillingRecordsTableWidget } from '@widgets/dashboard/infra-billing/infra-billing-records-table/infra-billing-records-table.widget'
 import { ViewInfraProviderDrawerWidget } from '@widgets/dashboard/infra-billing/view-infra-provider-drawer/view-infra-provider.drawer.widget'
+import { NodesUsersUsageStatisticsDrawer } from '@widgets/dashboard/nodes/nodes-users-usage-statistics/nodes-users-usage-statistics.drawer'
 import { InfraBillingNodesTableWidget } from '@widgets/dashboard/infra-billing/infra-billing-nodes-table/infra-billing-nodes.widget'
 import { InfraProvidersTableWidget } from '@widgets/dashboard/infra-billing/infra-providers-table/infra-providers-table.widget'
+import { EditNodeByUuidModalWidget } from '@widgets/dashboard/nodes/edit-node-by-uuid-modal/edit-node-by-uuid-modal.widget'
+import { NodeUsersUsageDrawer } from '@widgets/dashboard/nodes/node-users-usage-statistic/node-users-usage-drawer.widget'
+import { LinkedHostsDrawer } from '@widgets/dashboard/nodes/linked-hosts-drawer/linked-hosts-drawer.widget'
 import { UpdateBillingDateModalWidget } from '@widgets/dashboard/infra-billing/update-billing-date-modal'
 import { StatsWidget } from '@widgets/dashboard/infra-billing/stats-widget/stats.widget'
 import { MobileInfraBillingWidget } from '@widgets/dashboard/infra-billing/mobile'
 import { preventBackScrollTables } from '@shared/utils/misc'
+import { useIsMobile } from '@shared/hooks'
 import { Page } from '@shared/ui/page'
 
 export const InfraBillingPageComponent = () => {
     const { t } = useTranslation()
-    const isMobile = useMediaQuery('(max-width: 48em)')
+    const isMobile = useIsMobile()
 
     useLayoutEffect(() => {
         if (isMobile) {
@@ -72,6 +76,11 @@ export const InfraBillingPageComponent = () => {
             <CreateInfraBillingRecordDrawerWidget />
             <UpdateBillingDateModalWidget />
             <CreateInfraBillingNodeModalWidget />
+
+            <EditNodeByUuidModalWidget key="edit-node-by-uuid-modal" />
+            <NodeUsersUsageDrawer key="node-users-usage-drawer" />
+            <LinkedHostsDrawer key="linked-hosts-drawer" />
+            <NodesUsersUsageStatisticsDrawer key="nodes-users-usage-statistics-drawer" />
         </Page>
     )
 }

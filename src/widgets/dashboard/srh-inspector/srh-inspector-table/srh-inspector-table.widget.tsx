@@ -2,21 +2,18 @@
 import {
     MantineReactTable,
     MRT_ColumnFilterFnsState,
-    MRT_ColumnFiltersState,
-    MRT_ColumnPinningState,
-    MRT_PaginationState,
     MRT_SortingState,
-    MRT_VisibilityState,
     useMantineReactTable
-} from 'mantine-react-table'
+} from '@kastov/mantine-react-table-open'
 import { TbExternalLink, TbRefresh, TbReportAnalytics, TbRestore } from 'react-icons/tb'
 import { ActionIcon, ActionIconGroup, Tooltip } from '@mantine/core'
 import { useLayoutEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { PiUserCircle } from 'react-icons/pi'
 
 import { useSrhInspectorTableColumns } from '@features/dashboard/srh-inspector/srh-inspector-table/model/use-srh-inspector-table-columns'
-import { useUserModalStoreActions } from '@entities/dashboard/user-modal-store'
+import { useSrhInspectorTableStore } from '@entities/dashboard/srh-inspector/srh-inspector-table-store'
+import { DEFAULT_PAGINATION_STATE, useMrtTableBinding } from '@shared/lib/mrt-table-store'
+import { ResolveUserActionShared } from '@shared/ui/resolve-user-action-icon'
 import { useGetSubscriptionRequestHistory } from '@shared/api/hooks'
 import { preventBackScrollTables } from '@shared/utils/misc'
 import { DataTableShared } from '@shared/ui/table'
@@ -26,19 +23,12 @@ export function SrhInspectorTableWidget() {
     const { t } = useTranslation()
 
     const tableColumns = useSrhInspectorTableColumns()
-    const userModalActions = useUserModalStoreActions()
 
-    const [columnVisibility, setColumnVisibility] = useState<MRT_VisibilityState>({})
-    const [columnPinning, setColumnPinning] = useState<MRT_ColumnPinningState>({})
-    const [showColumnFilters, setShowColumnFilters] = useState(false)
+    const { state: persistedTableState, handlers: persistedTableHandlers } =
+        useMrtTableBinding(useSrhInspectorTableStore)
+
     const [sorting, setSorting] = useState<MRT_SortingState>([])
 
-    const [pagination, setPagination] = useState<MRT_PaginationState>({
-        pageIndex: 0,
-        pageSize: 25
-    })
-
-    const [columnFilters, setColumnFilters] = useState<MRT_ColumnFiltersState>([])
     const [columnFilterFns, setColumnFilterFns] = useState<MRT_ColumnFilterFnsState>(
         Object.fromEntries(tableColumns.map(({ accessorKey }) => [accessorKey, 'contains']))
     )
@@ -53,9 +43,9 @@ export function SrhInspectorTableWidget() {
     }, [])
 
     const params = {
-        start: pagination.pageIndex * pagination.pageSize,
-        size: pagination.pageSize,
-        filters: columnFilters,
+        start: persistedTableState.pagination.pageIndex * persistedTableState.pagination.pageSize,
+        size: persistedTableState.pagination.pageSize,
+        filters: persistedTableState.columnFilters,
         filterModes: columnFilterFns,
         sorting
     }
@@ -80,24 +70,15 @@ export function SrhInspectorTableWidget() {
         enableSortingRemoval: true,
         enableGlobalFilter: false,
         enableClickToCopy: true,
+        enableColumnOrdering: true,
         columnFilterModeOptions: ['contains'],
         initialState: {
-            pagination: {
-                pageIndex: 0,
-                pageSize: 25
-            },
-            showColumnFilters: false,
             density: 'xs',
-            columnVisibility: {},
-            columnPinning: {},
-            columnSizing: {}
+            pagination: DEFAULT_PAGINATION_STATE
         },
         manualFiltering: true,
         manualPagination: true,
         manualSorting: true,
-        // mantinePaginationProps: {
-        //     rowsPerPageOptions: ['25', '50', '100']
-        // },
 
         enableColumnResizing: true,
 
@@ -107,13 +88,9 @@ export function SrhInspectorTableWidget() {
             children: t('user-table.widget.error-loading-data')
         } : undefined,
 
+        ...persistedTableHandlers,
         onColumnFilterFnsChange: setColumnFilterFns,
-        onColumnFiltersChange: setColumnFilters,
-        onPaginationChange: setPagination,
         onSortingChange: setSorting,
-        onColumnPinningChange: setColumnPinning,
-        onColumnVisibilityChange: setColumnVisibility,
-        onShowColumnFiltersChange: setShowColumnFilters,
 
         mantinePaperProps: {
             style: { '--paper-radius': 'var(--mantine-radius-xs)' },
@@ -125,30 +102,17 @@ export function SrhInspectorTableWidget() {
         positionToolbarAlertBanner: 'top',
         selectAllMode: 'page',
         state: {
+            ...persistedTableState,
             columnFilterFns,
-            columnFilters,
             isLoading,
-            pagination,
             showAlertBanner: isError,
             showProgressBars: isFetching,
-            showColumnFilters,
-            sorting,
-            columnVisibility,
-            columnPinning
+            sorting
         },
         enableRowActions: true,
         renderRowActions: ({ row }) => (
             <ActionIconGroup>
-                <ActionIcon
-                    onClick={async () => {
-                        await userModalActions.setUserUuid(row.original.userUuid)
-                        userModalActions.changeModalState(true)
-                    }}
-                    size="input-sm"
-                    variant="soft"
-                >
-                    <PiUserCircle size="1.5rem" />
-                </ActionIcon>
+                <ResolveUserActionShared userId={row.original.userId} />
                 <ActionIcon
                     color="grape"
                     onClick={async () => {
@@ -194,6 +158,9 @@ export function SrhInspectorTableWidget() {
                                     table.resetPagination(false)
                                     table.resetColumnFilters(true)
                                     table.resetGlobalFilter(true)
+                                    table.resetColumnOrder(true)
+                                    table.resetColumnPinning(true)
+                                    table.resetColumnVisibility(true)
                                 }}
                                 size="input-md"
                                 variant="light"

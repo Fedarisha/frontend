@@ -4,11 +4,10 @@ import {
     GetPubKeyCommand,
     UpdateNodeCommand
 } from '@remnawave/backend-contract'
-import { Button, CopyButton, em, Group, Menu, px, Stack } from '@mantine/core'
+import { Button, CopyButton, Group, Menu, px, Stack } from '@mantine/core'
 import { PiFloppyDiskDuotone } from 'react-icons/pi'
 import { UseFormReturnType } from '@mantine/form'
 import { TbCopy, TbDots } from 'react-icons/tb'
-import { useMediaQuery } from '@mantine/hooks'
 import { motion } from 'framer-motion'
 import { ReactNode } from 'react'
 import { t } from 'i18next'
@@ -19,6 +18,7 @@ import { ResetNodeTrafficFeature } from '@features/ui/dashboard/nodes/reset-node
 import { ModalAccordionWidget } from '@widgets/dashboard/nodes/modal-accordeon-widget'
 import { DeleteNodeFeature } from '@features/ui/dashboard/nodes/delete-node'
 import { ModalFooter } from '@shared/ui/modal-footer'
+import { useIsMobile } from '@shared/hooks'
 
 import { NodeTrackingAndBillingCard } from './node-tracking-and-billing.card'
 import { NodeConfigProfilesCard } from './node-config-profiles.card'
@@ -71,7 +71,7 @@ export const BaseNodeForm = <T extends UpdateNodeCommand.Request>(props: IProps<
         isDataSubmitting
     } = props
 
-    const isMobile = useMediaQuery(`(max-width: ${em(768)})`)
+    const isMobile = useIsMobile()
 
     return (
         <>
@@ -97,6 +97,7 @@ export const BaseNodeForm = <T extends UpdateNodeCommand.Request>(props: IProps<
                         form={form}
                         motionWrapper={MotionWrapper}
                         nodePlugins={nodePlugins}
+                        nodeUuid={node.uuid}
                         pubKey={pubKey}
                     />
 
@@ -139,6 +140,7 @@ export const BaseNodeForm = <T extends UpdateNodeCommand.Request>(props: IProps<
                             form={form}
                             motionWrapper={MotionWrapper}
                             nodePlugins={nodePlugins}
+                            nodeUuid={node.uuid}
                             pubKey={pubKey}
                         />
 

@@ -60,7 +60,9 @@
         "nothing-found": "چیزی یافت نشد",
         "name": "اسم",
         "clone": "همانندسازی",
-        "event-sent": "رویداد ارسال شد"
+        "event-sent": "رویداد ارسال شد",
+        "open": "Open",
+        "color": "Color"
     },
     "bandwidth-metrics": {
         "current-year": "امسال",
@@ -153,7 +155,8 @@
         "internal-squads": "اسکوادهای داخلی",
         "first-connected-at": "اولین اتصال",
         "sub-last-opened-at": "آخرین دریافت اشتراک",
-        "tag": "برچسب"
+        "tag": "برچسب",
+        "used-traffic": "Used Traffic (%)"
     },
     "header-buttons": {
         "feature": {}
@@ -210,11 +213,7 @@
         "widget": {
             "edit-host": "ویرایش هاست",
             "dangling-host-cannot-be-cloned": "نمی‌توان هاست معلق را کلون کرد",
-            "error": "خطا",
-            "are-you-sure": "آیا مطمئن هستید؟",
-            "allowing-insecure-connections-can-lead-to-security-risks-we-do-not-recommend-enabling-this-option": "اجازه دادن برای برقراری اتصال‌های ناامن می‌تواند موجب ریسک‌های امنیتی شود. ما فعال کردن این گزینه را پیشنهاد نمی‌کنیم.",
-            "proceed": "ادامه",
-            "cancel": "انصراف"
+            "error": "خطا"
         }
     },
     "hosts-page-header": {
@@ -298,7 +297,7 @@
             "traffic-reset-strategy": "دوره بازنشانی ترافیک",
             "traffic-reset-strategy-description": "هر چند وقت یک بار ترافیک کاربر بازنشانی شود",
             "data-limit": "محدودیت ترافیک",
-            "data-limit-description": "محدودیت ترافیک را به گیگابایت وارد کنید (0 به معنی نامحدود است)",
+            "data-limit-description": "Enter data limit in GiB (0 for unlimited)",
             "username-cannot-be-changed-later": "نام کاربری نمی تواند بعدا تغییر داده شود",
             "loading-user-creation": "در حال بارگذاری صفحه ساخت کاربر ...",
             "create-user": "ساخت کاربر",
@@ -414,7 +413,6 @@
         "override-sni-from-address": "بازنویسی SNI از آدرس دامنه",
         "override-sni-from-address-description": "این گزینه مقدار SNI را با آدرس مشخص شده جایگزین خواهد کرد که برای کانفیگ‌های چند دامنه‌ای و wildcard قابل استفاده می‌باشد",
         "legacy-options": "تنظیمات قدیمی",
-        "allow-insecure": "اجازه اتصال ناامن",
         "shuffled-hosts-hover-card": "هاست‌های به هم زده شده در بالای لیست قرار گرفته و به صورت تصادفی مرتب خواهند شد.",
         "vless-route-description": "از 1 تا 65535، برای غیرفعال‌سازی 0 یا خالی بگذارید",
         "misc-settings": "تنظیمات متفرقه",
@@ -445,7 +443,6 @@
         "internal-name-placeholder": "برای مثال US-NY-Node-01",
         "address": "آدرس",
         "e-g-example-com": "مثلا example.com",
-        "consumption-multiplier": "ضریب مصرف ترافیک",
         "traffic-tracking": "پایش مصرف ترافیک",
         "limit": "حد مصرف",
         "reset-day": "روز صفر کردن ترافیک",
@@ -471,6 +468,25 @@
             "short-stats": "آمار مختصر",
             "remnawave-usage": "مصرف منابع Remnawave",
             "process-details": "مشخصات Process"
+        },
+        "runtime-info": {
+            "title": "Runtime Metrics Guide",
+            "subtitle": "What every number on a runtime card actually means",
+            "intro": "Each card shows a live snapshot of a single <highlight>Remnawave process</highlight>. Use this guide to understand what each metric measures and when to worry about it.",
+            "instance-types-title": "Process Types",
+            "instance-types-description": "Remnawave is split into several specialized processes. Each one has its own job, its own memory, and its own event loop.",
+            "api-description": "Handles every HTTP requests from the dashboard, and subscription endpoints. This is the <highlight>main user-facing process</highlight> — virtually every panel and subscription request is served here.",
+            "scheduler-description": "A <highlight>cron-driven dispatcher</highlight>. It does not run any work itself — at the scheduled moment it simply pushes a job into the queue for the <highlight>Processor</highlight> to pick up.",
+            "processor-description": "The actual <highlight>worker</highlight>. It consumes queued jobs and runs the heavy lifting: <highlight>node health checks</highlight>, <highlight>traffic aggregation</highlight> per user and per node, and other long-running tasks that must not block the API.",
+            "memory-description": "Where the process holds its working data. All values are reported by Node.js in real time.",
+            "heap-description": "Memory used by JavaScript objects, managed by <highlight>V8</highlight> — Node.js' engine. Shown as <highlight>used / total</highlight>. A high ratio is <highlight>expected and healthy</highlight> — V8 holds onto memory until it really needs more, so something like <highlight>100 / 120 MB</highlight> is normal, not a warning.",
+            "rss-description": "<highlight>Resident Set Size</highlight> — the total physical memory the OS has given to the process, including the heap, native code, and shared libraries. The best single signal of <highlight>how much RAM this process is actually using</highlight>.",
+            "external-description": "Memory held outside V8 by native C++ objects bound to JavaScript — typical sources are <highlight>open sockets</highlight>, <highlight>streams</highlight>, and Buffer-backed payloads.",
+            "array-buffers-description": "Memory specifically allocated for <highlight>ArrayBuffer</highlight> and <highlight>Buffer</highlight> instances (raw binary data). It is counted as a subset of <highlight>External</highlight>.",
+            "event-loop-description": "Health of the single-threaded loop that drives all asynchronous work in Node.js. If the loop is blocked, the whole process stalls.",
+            "delay-description": "Average time between consecutive event loop ticks. A healthy value sits close to <highlight>0–2 ms</highlight>. Higher numbers mean the loop is being blocked by long synchronous work.",
+            "p99-description": "<highlight>99th percentile</highlight> of event loop delay over the measurement window. Reveals worst-case latency that the average alone hides — useful for spotting occasional spikes.",
+            "active-handles-description": "Long-lived resources keeping the loop alive: <highlight>open sockets</highlight>, <highlight>timers</highlight>, <highlight>file descriptors</highlight>. Steady-state is normal; <highlight>unbounded growth</highlight> is a strong leak signal."
         }
     },
     "login-form": {
@@ -524,8 +540,7 @@
         "column": {
             "monthly": "ماهانه",
             "weekly": "هفتگی",
-            "daily": "روزانه",
-            "monthly-rolling": "Monthly (rolling)"
+            "daily": "روزانه"
         }
     },
     "get-time-ago": {
@@ -617,8 +632,15 @@
             "set-port": "تنظیم پورت",
             "port": "پورت",
             "clear-selection": "پاک کردن انتخاب",
-            "select-all": "انتخاب همه"
+            "select-all": "انتخاب همه",
+            "dangling-hosts-skipped": "{{count}} dangling host(s) were skipped and not cloned."
         }
+    },
+    "edit-many-hosts-drawer": {
+        "confirm-title": "Confirm bulk update",
+        "confirm-description": "The following fields will be updated for {{count}} host(s):",
+        "no-changes-title": "Nothing to update",
+        "no-changes-description": "You haven't changed any fields."
     },
     "bulk-user-actions-drawer": {
         "widget": {
@@ -690,10 +712,8 @@
                     "perform-action-on-users": "انجام اقدامات برای {{usersCount}} کاربر انتخاب‌شده",
                     "resets-the-traffic-usage-to-zero-for-all-selected-users": "ترافیک مصرفی را برای همه کاربران انتخاب‌شده به صفر بازنشانی می‌کند",
                     "revokes-subscription-for-all-selected-users": "اشتراک را برای همه کاربران انتخاب‌شده لغو می‌کند",
-                    "change-active-internal-squads": "تغییر دادن اسکوادهای فعال",
                     "specify-internal-squads-that-will-be-assigned-to-the-user": "اسکوادهایی که این کاربر عضو آن‌ها خواهد شد را مشخص کنید",
                     "internal-squads": "اسکوادهای داخلی",
-                    "changes-the-active-internal-squads-for-all-selected-users": "اسکوادهای فعال را برای همه کاربران انتخاب شده تغییر می‌دهد",
                     "extend-expiration-date": "تمدید زمان انقضا",
                     "enter-the-number-of-days-to-extend-the-expiration-date": "تعداد روزهایی که به زمان اشتراک افزوده می‌شوند.",
                     "extend-days": "روزهای تمدید ",
@@ -821,7 +841,6 @@
             "revoked-at": "لغو شده در",
             "connection-information": "اطلاعات اتصال",
             "trojan-password": "رمز عبور تروجان",
-            "vless-uuid": "(UUID) شناسه VLESS",
             "ss-password": "رمز عبور SS",
             "last-online": "آخرین آنلاین",
             "last-connected-node": "آخرین نود متصل‌شده",
@@ -899,8 +918,8 @@
             "total-traffic-prettybytestoanyutil": "ترافیک کل: {{totalTraffic}}",
             "user": "کاربر",
             "traffic": "ترافیک",
-            "no-users-with-traffic-100-kb": "هیچ کاربری با ترافیک ≥ 100 کیلوبایت وجود ندارد",
-            "users-hidden-with-less-than-100-kb": "{{usersCount}} کاربر با کمتر از 100 کیلوبایت مخفی شده‌اند ({{totalTraffic}} کل)"
+            "no-users-with-traffic-100-kb": "No users with traffic ≥ 100 KiB",
+            "users-hidden-with-less-than-100-kb": "{{usersCount}} users hidden with less than 100 KiB ({{totalTraffic}} total)"
         }
     },
     "get-hwid-user-devices": {
@@ -1258,6 +1277,17 @@
             "filter-by-tags": "فیلتر بر اساس برچسب"
         }
     },
+    "disclaimer-overlay": {
+        "title": "Disclaimer",
+        "subtitle": "Please read this notice before you continue.",
+        "intro": "Remnawave is an <highlight>open-source, self-hosted</highlight> proxy and user-management tool. It is provided <warning>\"as is\", without any warranty</warning> of any kind, express or implied.",
+        "responsibility": "You are <highlight>solely responsible</highlight> for how you deploy and use this software.",
+        "compliance": "You must comply with <highlight>all laws and regulations</highlight> applicable in your jurisdiction.",
+        "liability": "The developers and contributors accept <warning>no liability</warning> for any misuse, damage, or data loss.",
+        "license-acknowledgement": "By continuing you acknowledge that you have read and agree to the <anchor>license terms</anchor>.",
+        "accept-button": "I understand and accept",
+        "shown-once": "This notice is shown only once."
+    },
     "mobile-warning-overlay": {
         "mobile-device-detected": "دستگاه موبایل شناسایی شد",
         "description-line-1": "این صفحه حاوی جدول‌های پیچیده‌ای است که شاید روی دستگاه موبایل به خوبی قابل استفاده نباشند",
@@ -1496,7 +1526,8 @@
         "content-for-the-remnawave-node-below": "زیر را برای نود کپی کنید.",
         "learn-more": "اطلاعات بیشتر.",
         "domain-or-ip": "دامنه یا آیپی",
-        "node-image": "ایمیج نود"
+        "node-image": "ایمیج نود",
+        "additional-options": "Additional options"
     },
     "create-node-step-3-status": {
         "establishing-mtls-connection": "درحال برقراری اتصال mTLS",
@@ -1987,7 +2018,9 @@
             "plugin": "Plugin",
             "review-documentation-for-more-information": "Review documentation for more information.",
             "nothing-found": "Nothing found...",
-            "select-plugin": "Select plugin"
+            "select-plugin": "Select plugin",
+            "proxy-url": "Proxy URL",
+            "proxy-url-description": "Optional. If provided, internal API connection from panel to node will be proxied through this proxy."
         }
     },
     "node-plugin-card": {
@@ -2130,6 +2163,52 @@
         "widget": {
             "history": "History",
             "providers": "Providers"
+        }
+    },
+    "prime-modal": {
+        "shared": {
+            "description": "Back the project and become part of its inner circle - closer to the team, the roadmap, and the work itself.",
+            "priority-support-title": "Priority Support",
+            "priority-support-description": "Skip the queue - your questions are answered first, directly by the team.",
+            "private-community-title": "Private Community",
+            "private-community-description": "A closed circle of Prime members.",
+            "shape-the-roadmap-title": "Shape the Roadmap",
+            "shape-the-roadmap-description": "Vote on what gets built next and help steer where the project goes.",
+            "direct-developer-access-title": "Direct Developer Access",
+            "direct-developer-access-description": "A direct line to the developer - no tickets, no middlemen.",
+            "join-button": "Join RW Prime"
+        }
+    },
+    "hosts-datatable": {
+        "widget": {
+            "reset-sort": "Reset sort"
+        }
+    },
+    "columns-visibility-popover": {
+        "show-all": "Show all",
+        "hide-all": "Hide all"
+    },
+    "use-hosts-table-widget": {
+        "disabled": "Disabled",
+        "enabled": "Enabled",
+        "hidden": "Hidden"
+    },
+    "node-tracking-and-billing": {
+        "card": {
+            "note": "Note"
+        }
+    },
+    "node-consumption": {
+        "card": {
+            "node-consumption-multiplier-1": "Applies selected multiplier to Node traffic (1.0 = normal, 0.5 = half, 2.0 = double).",
+            "node-consumption-multiplier-2": "Mainly used for accurate display of usage limits when traffic tracking is enabled. The node consumption multiplier does not affect detailed statistics display (on graphs).",
+            "node-consumption-multiplier": "Node Consumption Multiplier",
+            "user-consumption-multiplier": "User Consumption Multiplier"
+        }
+    },
+    "keypair-generator": {
+        "widget": {
+            "generate": "Generate"
         }
     }
 }

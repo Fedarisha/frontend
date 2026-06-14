@@ -22,13 +22,13 @@ import {
 } from 'react-icons/pi'
 import { GetNodesMetricsCommand } from '@remnawave/backend-contract'
 import { VirtuosoMasonry } from '@virtuoso.dev/masonry'
-import { useMediaQuery } from '@mantine/hooks'
 import { useCallback, useMemo } from 'react'
 import { TbServer } from 'react-icons/tb'
 
 import { MODALS, useModalsStoreOpenWithData } from '@entities/dashboard/modal-store'
 import { MetricCardShared } from '@shared/ui/metrics/metric-card'
 import { useGetNodesMetrics } from '@shared/api/hooks'
+import { useIsMobile } from '@shared/hooks'
 
 import { NodeDetailsCard } from './node-details-card'
 import styles from './NodeDetails.module.css'
@@ -36,7 +36,7 @@ import styles from './NodeDetails.module.css'
 export const NodeMetricsWidget = () => {
     const { data: nodeMetrics, isLoading } = useGetNodesMetrics()
     const openModalWithData = useModalsStoreOpenWithData()
-    const isMobile = useMediaQuery('(max-width: 768px)')
+    const isMobile = useIsMobile()
 
     const handleNodeClick = useCallback(
         (nodeUuid: string) => {

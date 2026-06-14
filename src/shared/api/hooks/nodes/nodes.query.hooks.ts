@@ -1,6 +1,7 @@
 import {
     GetAllNodesCommand,
     GetAllNodesTagsCommand,
+    GetNodeMetadataCommand,
     GetOneNodeCommand,
     GetPubKeyCommand
 } from '@remnawave/backend-contract'
@@ -23,7 +24,10 @@ export const nodesQueryKeys = createQueryKeys('nodes', {
     },
     getAllTags: {
         queryKey: null
-    }
+    },
+    getNodeMetadata: (route: GetNodeMetadataCommand.RequestParams) => ({
+        queryKey: [route]
+    })
 })
 
 export const useGetNodes = createGetQueryHook({
@@ -71,4 +75,14 @@ export const useGetNodesTags = createGetQueryHook({
         staleTime: 0
     },
     errorHandler: (error) => errorHandler(error, 'Get All Nodes Tags')
+})
+
+export const useGetNodeMetadata = createGetQueryHook({
+    endpoint: GetNodeMetadataCommand.TSQ_url,
+    responseSchema: GetNodeMetadataCommand.ResponseSchema,
+    routeParamsSchema: GetNodeMetadataCommand.RequestParamsSchema,
+    getQueryKey: ({ route }) => nodesQueryKeys.getNodeMetadata(route!).queryKey,
+    rQueryParams: {
+        staleTime: sToMs(60)
+    }
 })

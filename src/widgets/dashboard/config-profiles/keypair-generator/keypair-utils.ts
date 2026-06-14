@@ -9,7 +9,7 @@ export const generateX25519 = () => {
     const kp = generateKeyPair()
     return {
         privateKey: encodeURLSafe(kp.secretKey).replace(/=/g, '').replace(/\n/g, ''),
-        publicKey: encodeURLSafe(kp.publicKey).replace(/=/g, '').replace(/\n/g, '')
+        password: encodeURLSafe(kp.publicKey).replace(/=/g, '').replace(/\n/g, '')
     }
 }
 

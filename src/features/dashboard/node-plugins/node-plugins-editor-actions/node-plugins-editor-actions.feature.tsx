@@ -8,10 +8,10 @@ import {
     TbMenuDeep,
     TbSelectAll
 } from 'react-icons/tb'
-import { useClipboard, useDisclosure, useMediaQuery } from '@mantine/hooks'
 import { UpdateNodePluginCommand } from '@remnawave/backend-contract'
 import { PiCheckSquareOffset, PiFloppyDisk } from 'react-icons/pi'
 import { ActionIcon, Button, Group, Menu } from '@mantine/core'
+import { useClipboard, useDisclosure } from '@mantine/hooks'
 import { notifications } from '@mantine/notifications'
 import { useTranslation } from 'react-i18next'
 import { Monaco } from '@monaco-editor/react'
@@ -20,6 +20,7 @@ import { RefObject } from 'react'
 
 import { useDownloadTemplate } from '@shared/ui/load-templates/use-download-template'
 import { QueryKeys, useUpdateNodePlugin } from '@shared/api/hooks'
+import { useIsMobile } from '@shared/hooks'
 import { queryClient } from '@shared/api'
 
 interface Props {
@@ -49,7 +50,7 @@ export function NodePluginsEditorActionsFeature(props: Props) {
     } = props
     const { t } = useTranslation()
 
-    const isMobile = useMediaQuery('(max-width: 48em)')
+    const isMobile = useIsMobile()
     const clipboard = useClipboard({ timeout: 500 })
     const [opened, handlers] = useDisclosure(false)
 

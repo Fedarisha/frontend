@@ -1,14 +1,22 @@
 import { ActionIcon, ActionIconGroup, Group, Tooltip } from '@mantine/core'
-import { TbPlus, TbRefresh } from 'react-icons/tb'
+import { TbCards, TbPlus, TbRefresh, TbTable } from 'react-icons/tb'
 import { useTranslation } from 'react-i18next'
 
 import { HelpActionIconShared } from '@shared/ui/help-drawer/help-action-icon.shared'
 import { MODALS, useModalsStoreOpenWithData } from '@entities/dashboard/modal-store'
 import { UniversalSpotlightActionIconShared } from '@shared/ui/universal-spotlight'
+import { HOSTS_VIEW_MODE } from '@entities/dashboard/view-preferences-store'
 import { QueryKeys, useGetHosts } from '@shared/api/hooks'
 import { queryClient } from '@shared/api'
 
-export const HeaderActionButtonsFeature = () => {
+interface IProps {
+    setViewMode: (viewMode: HOSTS_VIEW_MODE) => void
+    viewMode: HOSTS_VIEW_MODE
+}
+
+export const HeaderActionButtonsFeature = (props: IProps) => {
+    const { setViewMode, viewMode } = props
+
     const { t } = useTranslation()
 
     const openModalWithData = useModalsStoreOpenWithData()
@@ -30,6 +38,29 @@ export const HeaderActionButtonsFeature = () => {
             <HelpActionIconShared hidden={false} screen="PAGE_HOSTS" />
 
             <UniversalSpotlightActionIconShared />
+
+            <ActionIconGroup>
+                <Tooltip label="Toggle view mode">
+                    <ActionIcon
+                        color="gray"
+                        onClick={() =>
+                            setViewMode(
+                                viewMode === HOSTS_VIEW_MODE.TABLE
+                                    ? HOSTS_VIEW_MODE.CARDS
+                                    : HOSTS_VIEW_MODE.TABLE
+                            )
+                        }
+                        size="input-md"
+                        variant="soft"
+                    >
+                        {viewMode === HOSTS_VIEW_MODE.CARDS ? (
+                            <TbTable size="24px" />
+                        ) : (
+                            <TbCards size="24px" />
+                        )}
+                    </ActionIcon>
+                </Tooltip>
+            </ActionIconGroup>
 
             <ActionIconGroup>
                 <Tooltip label={t('common.update')} withArrow>

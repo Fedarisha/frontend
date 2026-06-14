@@ -30,6 +30,7 @@ export const KeypairGeneratorWidget = () => {
             <Tabs
                 classNames={classes}
                 keepMounted
+                keepMountedMode="display-none"
                 onChange={(value) => value && setActiveTab(value as TabTypes)}
                 value={activeTab}
                 variant="unstyled"
@@ -72,11 +73,11 @@ export const KeypairGeneratorWidget = () => {
                             <Stack gap="md" style={styles}>
                                 <Stack gap="xs">
                                     <CopyableFieldShared
-                                        label={t('keypair.widget.public-key')}
-                                        value={keyPair.publicKey}
+                                        label="Password"
+                                        value={keyPair.password}
                                     />
                                     <CopyableFieldShared
-                                        label={t('keypair.widget.private-key')}
+                                        label="Prvate Key"
                                         value={keyPair.privateKey}
                                     />
                                 </Stack>
@@ -86,7 +87,7 @@ export const KeypairGeneratorWidget = () => {
                                 <Stack gap="xs">
                                     <CopyableAreaShared
                                         label={t('keypair.widget.both-keys')}
-                                        value={`"publicKey": "${keyPair.publicKey}",
+                                        value={`"password": "${keyPair.password}",
 "privateKey": "${keyPair.privateKey}",`}
                                     />
                                 </Stack>
@@ -98,7 +99,7 @@ export const KeypairGeneratorWidget = () => {
                                         size="sm"
                                         variant="default"
                                     >
-                                        {t('keypair.widget.generate-key-pair')}
+                                        {t('keypair-generator.widget.generate')}
                                     </Button>
                                 </Group>
                             </Stack>

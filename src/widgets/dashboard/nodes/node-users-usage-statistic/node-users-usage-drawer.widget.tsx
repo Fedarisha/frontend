@@ -8,6 +8,7 @@ import dayjs from 'dayjs'
 import { MODALS, useModalCloseActions, useModalState } from '@entities/dashboard/modal-store'
 import { TopLeaderboardCardShared } from '@shared/ui/leaderboard-item-card'
 import { BaseOverlayHeader } from '@shared/ui/overlays/base-overlay-header'
+import { getDefaultDateRange } from '@shared/utils/time-utils'
 import { useGetStatsNodeUsersUsage } from '@shared/api/hooks'
 
 import { NodeUsersSparklineCardWidget } from './usage-sparkline-card'
@@ -25,12 +26,9 @@ const TOP_USERS_LIMIT_OPTIONS = [
 
 const DEFAULT_TOP_USERS_LIMIT = 100
 
-const DEFAULT_DATE_RANGE = {
-    start: dayjs.utc().subtract(6, 'day').format('YYYY-MM-DD'),
-    end: dayjs.utc().format('YYYY-MM-DD')
-}
-
 export const NodeUsersUsageDrawer = () => {
+    const defaultRange = getDefaultDateRange()
+
     const { isOpen, internalState: nodeUuid } = useModalState(MODALS.SHOW_NODE_USERS_USAGE_DRAWER)
     const [handleClose, clearInternalState] = useModalCloseActions(
         MODALS.SHOW_NODE_USERS_USAGE_DRAWER
@@ -40,16 +38,16 @@ export const NodeUsersUsageDrawer = () => {
 
     const [topUsersLimit, setTopUsersLimit] = useState<number>(DEFAULT_TOP_USERS_LIMIT)
     const [rawRange, setRawRange] = useState<[null | string, null | string]>([
-        DEFAULT_DATE_RANGE.start,
-        DEFAULT_DATE_RANGE.end
+        defaultRange.start,
+        defaultRange.end
     ])
 
-    const [queryRange, setQueryRange] = useState<{ end: string; start: string }>(DEFAULT_DATE_RANGE)
+    const [queryRange, setQueryRange] = useState<{ end: string; start: string }>(defaultRange)
 
     const handleDateRangeChange = (value: DatesRangeValue<string>) => {
         if (value[0] === null && value[1] === null) {
-            setRawRange([DEFAULT_DATE_RANGE.start, DEFAULT_DATE_RANGE.end])
-            setQueryRange(DEFAULT_DATE_RANGE)
+            setRawRange([defaultRange.start, defaultRange.end])
+            setQueryRange(defaultRange)
             return
         }
 
@@ -91,8 +89,8 @@ export const NodeUsersUsageDrawer = () => {
             keepMounted={false}
             onClose={handleClose}
             onExitTransitionEnd={() => {
-                setRawRange([DEFAULT_DATE_RANGE.start, DEFAULT_DATE_RANGE.end])
-                setQueryRange(DEFAULT_DATE_RANGE)
+                setRawRange([defaultRange.start, defaultRange.end])
+                setQueryRange(defaultRange)
                 setTopUsersLimit(DEFAULT_TOP_USERS_LIMIT)
                 clearInternalState()
             }}
@@ -226,7 +224,7 @@ export const NodeUsersUsageDrawer = () => {
                         total: user.total
                     }))}
                     maxHeight={500}
-                    skeletonCount={25}
+                    skeletonCount={11}
                 />
             </Stack>
         </Drawer>

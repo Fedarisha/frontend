@@ -1,6 +1,6 @@
 /* eslint-disable camelcase */
 import { GetAllHwidDevicesCommand } from '@remnawave/backend-contract'
-import { MRT_ColumnDef } from 'mantine-react-table'
+import { MRT_ColumnDef } from '@kastov/mantine-react-table-open'
 import { useTranslation } from 'react-i18next'
 import { useMemo } from 'react'
 import dayjs from 'dayjs'
@@ -12,6 +12,17 @@ export const useHwidInspectorTableColumns = () => {
         MRT_ColumnDef<GetAllHwidDevicesCommand.Response['response']['devices'][number]>[]
     >(
         () => [
+            {
+                accessorKey: 'userId',
+                header: 'User ID',
+                accessorFn: (originalRow) => originalRow.userId,
+                size: 130
+            },
+            {
+                accessorKey: 'requestIp',
+                header: t('use-srh-inspector-table-columns.request-ip'),
+                accessorFn: (originalRow) => originalRow.requestIp || '–'
+            },
             {
                 accessorKey: 'hwid',
                 header: 'HWID',
@@ -39,12 +50,6 @@ export const useHwidInspectorTableColumns = () => {
                 header: t('use-hwid-inspector-table-columns.user-agent'),
                 accessorFn: (originalRow) => originalRow.userAgent || '–',
                 size: 500
-            },
-            {
-                accessorKey: 'userUuid',
-                header: t('use-hwid-inspector-table-columns.user-uuid'),
-                accessorFn: (originalRow) => originalRow.userUuid,
-                size: 350
             },
 
             {

@@ -1,9 +1,8 @@
 import { CreateUserCommand, USERS_STATUS } from '@remnawave/backend-contract'
-import { Button, em, Group, Modal, Stack } from '@mantine/core'
+import { Button, Group, Modal, Stack } from '@mantine/core'
 import { zodResolver } from 'mantine-form-zod-resolver'
 import { PiFloppyDiskDuotone } from 'react-icons/pi'
 import { useTranslation } from 'react-i18next'
-import { useMediaQuery } from '@mantine/hooks'
 import { useForm } from '@mantine/form'
 import { TbUser } from 'react-icons/tb'
 import { motion } from 'motion/react'
@@ -30,7 +29,8 @@ import { BaseOverlayHeader } from '@shared/ui/overlays/base-overlay-header'
 import { LoaderModalShared } from '@shared/ui/loader-modal'
 import { handleFormErrors } from '@shared/utils/misc'
 import { ModalFooter } from '@shared/ui/modal-footer'
-import { gbToBytesUtil } from '@shared/utils/bytes'
+import { gibToBytesUtil } from '@shared/utils/bytes'
+import { useIsMobile } from '@shared/hooks'
 
 const MotionWrapper = motion.div
 const MotionStack = motion.create(Stack)
@@ -62,7 +62,7 @@ export const CreateUserModalWidget = () => {
     const { data: internalSquads, isLoading: isInternalSquadsLoading } = useGetInternalSquads()
     const { data: externalSquads } = useGetExternalSquads()
     const { data: tags, isLoading: isTagsLoading } = useGetUserTags()
-    const isMobile = useMediaQuery(`(max-width: ${em(768)})`)
+    const isMobile = useIsMobile()
 
     const handleCloseModal = () => {
         actions.changeModalState(false)
@@ -124,7 +124,7 @@ export const CreateUserModalWidget = () => {
                 variables: {
                     username: values.username,
                     trafficLimitStrategy: values.trafficLimitStrategy,
-                    trafficLimitBytes: gbToBytesUtil(values.trafficLimitBytes),
+                    trafficLimitBytes: gibToBytesUtil(values.trafficLimitBytes),
                     // @ts-expect-error - TODO: fix ZOD schema
                     expireAt: dayjs(values.expireAt).toISOString(),
                     status: values.status,
