@@ -1,4 +1,4 @@
-import { NavLink as RouterLink, useLocation } from 'react-router-dom'
+import { NavLink as RouterLink, useLocation } from 'react-router'
 import { Box, Divider, NavLink, Stack, Title } from '@mantine/core'
 import { PiArrowRight } from 'react-icons/pi'
 

@@ -1,5 +1,5 @@
 import { GetConfigProfilesCommand } from '@remnawave/backend-contract'
-import { generatePath, useNavigate } from 'react-router-dom'
+import { generatePath, useNavigate } from 'react-router'
 import { PiCpu, PiTag } from 'react-icons/pi'
 import { Badge, Group } from '@mantine/core'
 

@@ -9,7 +9,7 @@ import {
     Tooltip
 } from '@mantine/core'
 import { CreateSubscriptionPageConfigCommand } from '@remnawave/backend-contract'
-import { generatePath, useNavigate } from 'react-router-dom'
+import { generatePath, useNavigate } from 'react-router'
 import { TbFile, TbPlus, TbRefresh } from 'react-icons/tb'
 import { useDisclosure } from '@mantine/hooks'
 import { useTranslation } from 'react-i18next'

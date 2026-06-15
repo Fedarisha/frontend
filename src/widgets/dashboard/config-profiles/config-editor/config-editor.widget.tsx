@@ -4,7 +4,7 @@ import { Box, Button, Card, Code, Group, Loader, Paper, Text } from '@mantine/co
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import Editor, { Monaco, useMonaco } from '@monaco-editor/react'
 import { useTranslation } from 'react-i18next'
-import { useBlocker } from 'react-router-dom'
+import { useBlocker } from 'react-router'
 import { modals } from '@mantine/modals'
 
 import { ConfigEditorActionsFeature } from '@features/dashboard/config-profiles/config-editor-actions'

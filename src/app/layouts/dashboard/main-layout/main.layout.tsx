@@ -1,6 +1,6 @@
 import { useClickOutside, useDisclosure, useHeadroom, useMediaQuery } from '@mantine/hooks'
 import { AppShell, Box, Burger, Container, Group, ScrollArea } from '@mantine/core'
-import { Outlet } from 'react-router-dom'
+import { Outlet } from 'react-router'
 import clsx from 'clsx'
 
 import {

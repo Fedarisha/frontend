@@ -1,6 +1,6 @@
 import { PiArrowsClockwise, PiSignOutDuotone } from 'react-icons/pi'
 import { ActionIcon, Group } from '@mantine/core'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router'
 
 import { LanguagePicker } from '@shared/ui/language-picker/language-picker.shared'
 import { resetAllStores } from '@shared/hocs/store-wrapper'

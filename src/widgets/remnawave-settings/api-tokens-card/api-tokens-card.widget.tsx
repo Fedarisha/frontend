@@ -18,7 +18,7 @@ import { useDisclosure } from '@mantine/hooks'
 import { useTranslation } from 'react-i18next'
 import { SiSwagger } from 'react-icons/si'
 import { useField } from '@mantine/form'
-import { Link } from 'react-router-dom'
+import { Link } from 'react-router'
 
 import { BaseOverlayHeader } from '@shared/ui/overlays/base-overlay-header'
 import { useCreateApiToken, useGetApiTokens } from '@shared/api/hooks'

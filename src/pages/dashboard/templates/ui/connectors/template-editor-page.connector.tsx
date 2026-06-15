@@ -1,5 +1,5 @@
 import { SUBSCRIPTION_TEMPLATE_TYPE, TSubscriptionTemplateType } from '@remnawave/backend-contract'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router'
 
 import { useGetHosts, useGetSubscriptionTemplate } from '@shared/api/hooks'
 import { LoadingScreen } from '@shared/ui'

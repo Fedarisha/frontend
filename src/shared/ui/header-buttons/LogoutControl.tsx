@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router'
 import { PiSignOut } from 'react-icons/pi'
 import { rem } from '@mantine/core'
 

@@ -1,4 +1,4 @@
-import { createSearchParams, useNavigate } from 'react-router-dom'
+import { createSearchParams, useNavigate } from 'react-router'
 import { DatePickerInput, DatesRangeValue } from '@mantine/dates'
 import { ActionIcon, Group, Select, Stack } from '@mantine/core'
 import { TbCalendar, TbRefresh, TbUsers } from 'react-icons/tb'

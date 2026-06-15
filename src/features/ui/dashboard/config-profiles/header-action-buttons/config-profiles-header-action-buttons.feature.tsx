@@ -10,7 +10,7 @@ import {
     Tooltip
 } from '@mantine/core'
 import { CreateConfigProfileCommand } from '@remnawave/backend-contract'
-import { generatePath, useNavigate } from 'react-router-dom'
+import { generatePath, useNavigate } from 'react-router'
 import { TbCode, TbPlus, TbRefresh } from 'react-icons/tb'
 import { useDisclosure } from '@mantine/hooks'
 import { useTranslation } from 'react-i18next'

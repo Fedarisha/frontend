@@ -7,7 +7,7 @@ import {
 } from 'react-icons/tb'
 import { ActionIcon, Badge, Box, Group, Stack, Text, Tooltip } from '@mantine/core'
 import { FetchUsersIpsResultCommand } from '@remnawave/backend-contract'
-import { createSearchParams, useNavigate } from 'react-router-dom'
+import { createSearchParams, useNavigate } from 'react-router'
 import { PiEmptyDuotone, PiUserCircle } from 'react-icons/pi'
 import { useTranslation } from 'react-i18next'
 

@@ -1,6 +1,6 @@
 import { GetAllHostsCommand, GetSubscriptionTemplateCommand } from '@remnawave/backend-contract'
 import { ActionIcon, Group } from '@mantine/core'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router'
 import { TbArrowBackUp } from 'react-icons/tb'
 
 import { SubscriptionTemplateEditorWidget } from '@widgets/dashboard/templates/subscription-template-editor'

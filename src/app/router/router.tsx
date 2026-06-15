@@ -4,7 +4,7 @@ import {
     Navigate,
     Route,
     RouterProvider
-} from 'react-router-dom'
+} from 'react-router'
 
 import { SubpageConfigEditorPageConnector } from '@pages/dashboard/subpage-config/ui/connectors/subpage-config-editor-page.connector'
 import { ConfigProfileByUuidPageConnector } from '@pages/dashboard/config-profiles/connectors/config-profile-by-uuid.page.connector'

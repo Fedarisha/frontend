@@ -5,7 +5,7 @@ import { GetNodePluginCommand } from '@remnawave/backend-contract'
 import { Box, Card, Code, Paper, Text } from '@mantine/core'
 import Editor, { Monaco } from '@monaco-editor/react'
 import { useTranslation } from 'react-i18next'
-import { useBlocker } from 'react-router-dom'
+import { useBlocker } from 'react-router'
 import { modals } from '@mantine/modals'
 
 import { NodePluginsEditorActionsFeature } from '@features/dashboard/node-plugins/node-plugins-editor-actions'

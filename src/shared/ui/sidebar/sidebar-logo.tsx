@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router'
 import { Image } from '@mantine/core'
 
 import { useGetAuthStatus } from '@shared/api/hooks/auth/auth.query.hooks'

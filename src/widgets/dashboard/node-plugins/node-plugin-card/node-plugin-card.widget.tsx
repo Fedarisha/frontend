@@ -1,7 +1,7 @@
 import { PiCheck, PiCopy, PiCpu, PiPencil, PiTrashDuotone } from 'react-icons/pi'
 import { GetNodePluginsCommand } from '@remnawave/backend-contract'
 import { TbCopyCheck, TbEdit, TbPackage } from 'react-icons/tb'
-import { generatePath, useNavigate } from 'react-router-dom'
+import { generatePath, useNavigate } from 'react-router'
 import { CopyButton, Menu } from '@mantine/core'
 import { useTranslation } from 'react-i18next'
 

@@ -3,7 +3,7 @@ import { ActionIcon, Box, Drawer, Flex, Group, Transition } from '@mantine/core'
 import { TbArrowBackUp, TbCode, TbFile } from 'react-icons/tb'
 import { useMediaQuery } from '@mantine/hooks'
 import { useTranslation } from 'react-i18next'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router'
 
 import { ConfigEditorWidget } from '@widgets/dashboard/config-profiles/config-editor/config-editor.widget'
 import { SnippetsDrawerWidget } from '@widgets/dashboard/config-profiles/snippets-drawer'
@@ -59,7 +59,13 @@ export const ConfigProfileByUuidPageComponent = (props: Props) => {
 
                 {isMobile ? (
                     <>
-                        <ConfigEditorWidget configProfile={configProfile} isWasmCrashed={isWasmCrashed} isWasmRestarting={isWasmRestarting} onRestartWasm={onRestartWasm} snippets={snippets} />
+                        <ConfigEditorWidget
+                            configProfile={configProfile}
+                            isWasmCrashed={isWasmCrashed}
+                            isWasmRestarting={isWasmRestarting}
+                            onRestartWasm={onRestartWasm}
+                            snippets={snippets}
+                        />
 
                         <Drawer
                             keepMounted={false}
@@ -83,7 +89,13 @@ export const ConfigProfileByUuidPageComponent = (props: Props) => {
                 ) : (
                     <Flex gap="md">
                         <Box style={{ flex: 1, minWidth: 0 }}>
-                            <ConfigEditorWidget configProfile={configProfile} isWasmCrashed={isWasmCrashed} isWasmRestarting={isWasmRestarting} onRestartWasm={onRestartWasm} snippets={snippets} />
+                            <ConfigEditorWidget
+                                configProfile={configProfile}
+                                isWasmCrashed={isWasmCrashed}
+                                isWasmRestarting={isWasmRestarting}
+                                onRestartWasm={onRestartWasm}
+                                snippets={snippets}
+                            />
                         </Box>
 
                         <Box

@@ -1,6 +1,6 @@
 import { ActionIcon, Badge, Box, Group, Tooltip } from '@mantine/core'
 import { TbFingerprint, TbId, TbServer, TbSum } from 'react-icons/tb'
-import { createSearchParams, useNavigate } from 'react-router-dom'
+import { createSearchParams, useNavigate } from 'react-router'
 import { forwardRef, memo, useMemo } from 'react'
 import { GroupedVirtuoso } from 'react-virtuoso'
 import { useTranslation } from 'react-i18next'
@@ -195,10 +195,7 @@ export const SessionsExplorerCard = memo(
                             return (
                                 <SessionsExplorerIpRow
                                     ip={item.ip}
-                                    isMatch={
-                                        !!ipSearchQuery &&
-                                        item.ip.ip.includes(ipSearchQuery)
-                                    }
+                                    isMatch={!!ipSearchQuery && item.ip.ip.includes(ipSearchQuery)}
                                 />
                             )
                         }}

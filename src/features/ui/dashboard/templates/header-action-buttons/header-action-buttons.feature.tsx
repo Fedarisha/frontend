@@ -12,7 +12,7 @@ import {
     CreateSubscriptionTemplateCommand,
     TSubscriptionTemplateType
 } from '@remnawave/backend-contract'
-import { generatePath, useNavigate } from 'react-router-dom'
+import { generatePath, useNavigate } from 'react-router'
 import { TbFolder, TbPlus, TbRefresh } from 'react-icons/tb'
 import { useDisclosure } from '@mantine/hooks'
 import { useTranslation } from 'react-i18next'

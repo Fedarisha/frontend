@@ -1,6 +1,6 @@
 /* eslint-disable no-nested-ternary */
 import { useCallback, useEffect, useState } from 'react'
-import { useSearchParams } from 'react-router-dom'
+import { useSearchParams } from 'react-router'
 import { useTranslation } from 'react-i18next'
 import { useListState } from '@mantine/hooks'
 import { TbListCheck } from 'react-icons/tb'

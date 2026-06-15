@@ -3,7 +3,7 @@ import { PiCheck, PiCopy, PiCpu, PiPencil, PiTag, PiTrashDuotone } from 'react-i
 import { TbCheck, TbCpu2, TbDownload, TbEdit, TbEye } from 'react-icons/tb'
 import { GetConfigProfilesCommand } from '@remnawave/backend-contract'
 import { githubDarkTheme, JsonEditor } from 'json-edit-react'
-import { generatePath, useNavigate } from 'react-router-dom'
+import { generatePath, useNavigate } from 'react-router'
 import { notifications } from '@mantine/notifications'
 import { useTranslation } from 'react-i18next'
 import { modals } from '@mantine/modals'

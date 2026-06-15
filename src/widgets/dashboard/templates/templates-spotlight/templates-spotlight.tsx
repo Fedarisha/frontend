@@ -2,7 +2,7 @@ import {
     GetSubscriptionTemplatesCommand,
     TSubscriptionTemplateType
 } from '@remnawave/backend-contract'
-import { generatePath, useNavigate } from 'react-router-dom'
+import { generatePath, useNavigate } from 'react-router'
 
 import { UniversalSpotlightContentShared } from '@shared/ui/universal-spotlight'
 import { getCoreLogoFromType } from '@shared/ui'

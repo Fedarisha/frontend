@@ -4,7 +4,7 @@ import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { Box, Card, Code, Paper, Text } from '@mantine/core'
 import Editor, { Monaco } from '@monaco-editor/react'
 import { useTranslation } from 'react-i18next'
-import { useBlocker } from 'react-router-dom'
+import { useBlocker } from 'react-router'
 import { modals } from '@mantine/modals'
 
 import { ResponseRulesEditorActionsFeature } from '@features/dashboard/response-rules/response-rules-editor-actions'

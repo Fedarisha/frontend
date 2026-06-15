@@ -1,7 +1,7 @@
 import { GetNodePluginCommand } from '@remnawave/backend-contract'
 import { TbArrowBackUp, TbBook, TbPackage } from 'react-icons/tb'
 import { ActionIcon, Box, Flex, Group } from '@mantine/core'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router'
 
 import { NodePluginEditorWidget } from '@widgets/dashboard/node-plugins/node-plugin-editor'
 import { Page, PageHeaderShared } from '@shared/ui'

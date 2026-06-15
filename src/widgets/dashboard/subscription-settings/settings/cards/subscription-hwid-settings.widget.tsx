@@ -5,7 +5,7 @@ import { zodResolver } from 'mantine-form-zod-resolver'
 import { useTranslation } from 'react-i18next'
 import { TbDevices2 } from 'react-icons/tb'
 import { useForm } from '@mantine/form'
-import { Link } from 'react-router-dom'
+import { Link } from 'react-router'
 
 import { QueryKeys, useUpdateSubscriptionSettings } from '@shared/api/hooks'
 import { TemplateInfoPopoverShared } from '@shared/ui/popovers'

@@ -1,5 +1,5 @@
 import { GetNodePluginsCommand } from '@remnawave/backend-contract'
-import { generatePath, useNavigate } from 'react-router-dom'
+import { generatePath, useNavigate } from 'react-router'
 import { TbPackage } from 'react-icons/tb'
 
 import { UniversalSpotlightContentShared } from '@shared/ui/universal-spotlight'

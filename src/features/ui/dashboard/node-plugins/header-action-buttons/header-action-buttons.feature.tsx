@@ -10,7 +10,7 @@ import {
 } from '@mantine/core'
 import { TbBook, TbPackage, TbPlus, TbRefresh, TbTerminal } from 'react-icons/tb'
 import { CreateNodePluginCommand } from '@remnawave/backend-contract'
-import { generatePath, useNavigate } from 'react-router-dom'
+import { generatePath, useNavigate } from 'react-router'
 import { useDisclosure } from '@mantine/hooks'
 import { useTranslation } from 'react-i18next'
 import { useField } from '@mantine/form'

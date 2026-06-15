@@ -1,4 +1,4 @@
-import { useLocation } from 'react-router-dom'
+import { useLocation } from 'react-router'
 import { useLayoutEffect } from 'react'
 
 export function ScrollToTopWrapper({ children }: { children: React.ReactNode }) {

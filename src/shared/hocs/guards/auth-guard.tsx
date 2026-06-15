@@ -1,6 +1,7 @@
-import { Navigate, Outlet, useLocation } from 'react-router-dom'
+import { Navigate, Outlet, useLocation } from 'react-router'
 import { useLayoutEffect } from 'react'
 
+import { consumeReturnTo, saveReturnTo } from '@shared/utils/return-to.util'
 import { useUpdatesStoreActions } from '@entities/dashboard/updates-store'
 import { LoadingProgress } from '@shared/ui/loading-screen'
 import { useGetAuthStatus } from '@shared/api/hooks'
@@ -27,6 +28,7 @@ export function AuthGuard() {
         if (location.pathname.includes(ROUTES.AUTH.ROOT)) {
             return <Outlet />
         }
+        saveReturnTo(location.pathname + location.search)
         return <Navigate replace to={ROUTES.AUTH.LOGIN} />
     }
 
@@ -34,7 +36,7 @@ export function AuthGuard() {
         if (location.pathname.includes(ROUTES.DASHBOARD.ROOT)) {
             return <Outlet />
         }
-        return <Navigate replace to={ROUTES.DASHBOARD.ROOT} />
+        return <Navigate replace to={consumeReturnTo() ?? ROUTES.DASHBOARD.ROOT} />
     }
 
     return <Outlet />

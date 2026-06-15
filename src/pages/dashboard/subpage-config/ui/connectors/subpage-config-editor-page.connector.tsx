@@ -1,4 +1,4 @@
-import { useNavigate, useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router'
 
 import { useGetSubscriptionPageConfig } from '@shared/api/hooks'
 import { LoadingScreen } from '@shared/ui'

@@ -1,5 +1,5 @@
 import { useCallback, useLayoutEffect, useRef, useState } from 'react'
-import { Navigate, useParams } from 'react-router-dom'
+import { Navigate, useParams } from 'react-router'
 import { consola } from 'consola/browser'
 
 import { useGetConfigProfile, useGetSnippets } from '@shared/api/hooks'
@@ -51,10 +51,7 @@ export function ConfigProfileByUuidPageConnector() {
             if (wasmBytesCache.current) {
                 wasmBytes = wasmBytesCache.current
             } else {
-                wasmBytes = await fetchWithProgress(
-                    app.configEditor.wasmUrl,
-                    setDownloadProgress
-                )
+                wasmBytes = await fetchWithProgress(app.configEditor.wasmUrl, setDownloadProgress)
                 wasmBytesCache.current = wasmBytes
             }
 

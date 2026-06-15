@@ -1,5 +1,5 @@
 import { GetSubscriptionPageConfigsCommand } from '@remnawave/backend-contract'
-import { generatePath, useNavigate } from 'react-router-dom'
+import { generatePath, useNavigate } from 'react-router'
 import { TbFile } from 'react-icons/tb'
 
 import { UniversalSpotlightContentShared } from '@shared/ui/universal-spotlight'

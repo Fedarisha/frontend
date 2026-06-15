@@ -25,7 +25,7 @@ import {
     GetAllNodesCommand,
     GetConfigProfilesCommand
 } from '@remnawave/backend-contract'
-import { createSearchParams, useNavigate } from 'react-router-dom'
+import { createSearchParams, useNavigate } from 'react-router'
 import { PiNetwork, PiProhibit, PiPulse } from 'react-icons/pi'
 import { CSSProperties, useState } from 'react'
 import { useSortable } from '@dnd-kit/sortable'

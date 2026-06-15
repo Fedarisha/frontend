@@ -1,6 +1,6 @@
 import { GetSubscriptionTemplatesCommand } from '@remnawave/backend-contract'
 import { PiCheck, PiCopy, PiPencil, PiTrashDuotone } from 'react-icons/pi'
-import { generatePath, useNavigate } from 'react-router-dom'
+import { generatePath, useNavigate } from 'react-router'
 import { CopyButton, Menu } from '@mantine/core'
 import { useTranslation } from 'react-i18next'
 import { TbEdit } from 'react-icons/tb'

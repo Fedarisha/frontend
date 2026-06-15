@@ -1,10 +1,11 @@
 import { Center, Loader, Stack, Text, Title, Transition } from '@mantine/core'
-import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
+import { useNavigate, useParams, useSearchParams } from 'react-router'
 import { TOAuth2ProvidersKeys } from '@remnawave/backend-contract'
 import { notifications } from '@mantine/notifications'
 import { CSSProperties, useEffect } from 'react'
 import { IconCheck } from '@tabler/icons-react'
 
+import { consumeReturnTo } from '@shared/utils/return-to.util'
 import { useOauth2Callback } from '@shared/api/hooks'
 import { useAuth } from '@shared/hooks/use-auth'
 import { ROUTES } from '@shared/constants'
@@ -25,7 +26,7 @@ export const Oauth2CallbackPage = () => {
             onSuccess: () => {
                 setIsAuthenticated(true)
 
-                navigate(ROUTES.DASHBOARD.HOME)
+                navigate(consumeReturnTo() ?? ROUTES.DASHBOARD.HOME)
             },
             onError: (error) => {
                 notifications.show({
