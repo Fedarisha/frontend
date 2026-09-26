@@ -1,3 +1,9 @@
+import { GetActiveSessionsOnNodeFeature } from '@features/ui/dashboard/nodes/get-active-sesions-on-node'
+import { GetNodeGeocheckFeature } from '@features/ui/dashboard/nodes/get-node-geocheck'
+import { GetNodeInboundsHostsFeature } from '@features/ui/dashboard/nodes/get-node-inbounds-hosts'
+import { GetNodeLinkedHostsFeature } from '@features/ui/dashboard/nodes/get-node-linked-hosts'
+import { GetNodeUsersUsageFeature } from '@features/ui/dashboard/nodes/get-node-users-usage'
+import { OpenNodeSshFeature } from '@features/ui/dashboard/nodes/open-node-ssh'
 import {
     ActionIcon,
     Badge,
@@ -12,33 +18,30 @@ import {
     ThemeIconProps,
     Tooltip
 } from '@mantine/core'
+import { modals } from '@mantine/modals'
+import { GetNodeCommand, UpdateNodeCommand } from '@remnawave/backend-contract'
+import { githubDarkTheme, JsonEditor } from 'json-edit-react'
+import { memo, useCallback, useMemo } from 'react'
+import { useTranslation } from 'react-i18next'
 import {
     PiArrowsCounterClockwise,
     PiCloudArrowUpDuotone,
     PiUsersDuotone,
     PiWarningCircle
 } from 'react-icons/pi'
-import { GetOneNodeCommand, UpdateNodeCommand } from '@remnawave/backend-contract'
 import { TbJson, TbPower, TbWifi, TbWifiOff } from 'react-icons/tb'
-import { githubDarkTheme, JsonEditor } from 'json-edit-react'
-import { memo, useCallback, useMemo } from 'react'
-import { useTranslation } from 'react-i18next'
-import { modals } from '@mantine/modals'
 
-import { GetActiveSessionsOnNodeFeature } from '@features/ui/dashboard/nodes/get-active-sesions-on-node'
-import { QueryKeys, useDisableNode, useEnableNode, useGetNodeMetadata } from '@shared/api/hooks'
-import { GetNodeLinkedHostsFeature } from '@features/ui/dashboard/nodes/get-node-linked-hosts'
-import { GetNodeUsersUsageFeature } from '@features/ui/dashboard/nodes/get-node-users-usage'
-import { getNodeResetDaysUtil, getXrayUptimeUtil } from '@shared/utils/time-utils'
-import { BaseOverlayHeader } from '@shared/ui/overlays/base-overlay-header'
-import { prettyBytesToAnyUtil } from '@shared/utils/bytes'
-import { SectionCard } from '@shared/ui/section-card'
-import { XrayLogo } from '@shared/ui/logos'
 import { queryClient } from '@shared/api'
+import { QueryKeys, useDisableNode, useEnableNode, useGetNodeMetadata } from '@shared/api/hooks'
 import { Logo } from '@shared/ui'
+import { XrayLogo } from '@shared/ui/logos'
+import { BaseOverlayHeader } from '@shared/ui/overlays/base-overlay-header'
+import { SectionCard } from '@shared/ui/section-card'
+import { prettifyBytesUtil } from '@shared/utils/bytes'
+import { getNodeResetDaysUtil, getXrayUptimeUtil } from '@shared/utils/time-utils'
 
 interface IProps {
-    node: GetOneNodeCommand.Response['response']
+    node: GetNodeCommand.Response['response']
 }
 
 export const NodeDetailsCardWidget = memo((props: IProps) => {
@@ -107,10 +110,10 @@ export const NodeDetailsCardWidget = memo((props: IProps) => {
         let maxData = '∞'
         let percentage = 0
 
-        const prettyUsedData = prettyBytesToAnyUtil(node.trafficUsedBytes || 0) || '0 B'
+        const prettyUsedData = prettifyBytesUtil(node.trafficUsedBytes || 0) || '0 B'
 
         if (node.isTrafficTrackingActive) {
-            maxData = prettyBytesToAnyUtil(node.trafficLimitBytes || 0) || '∞'
+            maxData = prettifyBytesUtil(node.trafficLimitBytes || 0) || '∞'
             if (node.trafficLimitBytes === 0) {
                 percentage = 100
             } else {
@@ -301,11 +304,14 @@ export const NodeDetailsCardWidget = memo((props: IProps) => {
 
                     <Group gap="xs" justify="center">
                         <GetNodeLinkedHostsFeature nodeUuid={node.uuid} />
+                        <GetNodeInboundsHostsFeature nodeUuid={node.uuid} />
                     </Group>
 
                     <Divider opacity={0.3} orientation="vertical" />
 
                     <Group gap="xs" justify="center">
+                        <GetNodeGeocheckFeature node={node} />
+                        <OpenNodeSshFeature node={node} />
                         <GetNodeUsersUsageFeature nodeUuid={node.uuid} />
                         <GetActiveSessionsOnNodeFeature nodeUuid={node.uuid} />
                     </Group>

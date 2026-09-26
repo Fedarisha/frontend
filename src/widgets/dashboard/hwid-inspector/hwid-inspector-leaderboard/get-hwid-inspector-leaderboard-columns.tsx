@@ -1,13 +1,13 @@
-import { GetTopUsersByHwidDevicesCommand } from '@remnawave/backend-contract'
+import { DataTableColumn } from '@kastov/mantine-datatable'
 import { ActionIcon, Group, Text } from '@mantine/core'
-import { DataTableColumn } from 'mantine-datatable'
-import { TbSum, TbUser } from 'react-icons/tb'
-import { PiUserCircle } from 'react-icons/pi'
+import { GetTopUsersByHwidDevicesCommand } from '@remnawave/backend-contract'
 import { TFunction } from 'i18next'
+import { PiUserCircle } from 'react-icons/pi'
+import { TbSum, TbUser } from 'react-icons/tb'
 
 export function getHwidInspectorLeaderboardColumns(
     t: TFunction,
-    handleViewUser: (userUuid: string) => void
+    handleViewUser: (userId: number) => void
 ): DataTableColumn<GetTopUsersByHwidDevicesCommand.Response['response']['users'][number]>[] {
     return [
         {
@@ -29,13 +29,9 @@ export function getHwidInspectorLeaderboardColumns(
             ),
             width: '0%',
             textAlign: 'right',
-            render: ({ userUuid }) => (
+            render: ({ id }) => (
                 <Group gap={4} justify="flex-end" wrap="nowrap">
-                    <ActionIcon
-                        onClick={() => handleViewUser(userUuid)}
-                        size="input-sm"
-                        variant="soft"
-                    >
+                    <ActionIcon onClick={() => handleViewUser(id)} size="input-sm" variant="soft">
                         <PiUserCircle size="1.5rem" />
                     </ActionIcon>
                 </Group>
@@ -43,14 +39,8 @@ export function getHwidInspectorLeaderboardColumns(
         },
         {
             accessor: 'username',
-            title: t('detailed-user-info-drawer.widget.username'),
+            title: t('common.field.username'),
             render: ({ username }) => username
-        },
-
-        {
-            accessor: 'userUuid',
-            title: t('use-hwid-inspector-table-columns.user-uuid'),
-            render: ({ userUuid }) => userUuid
         },
         {
             accessor: 'id',

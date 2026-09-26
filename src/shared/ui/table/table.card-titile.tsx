@@ -9,8 +9,8 @@ import {
     Text,
     Title
 } from '@mantine/core'
-import { forwardRef, ReactNode } from 'react'
 import { motion } from 'motion/react'
+import { forwardRef, ReactNode } from 'react'
 
 import classes from './table.module.css'
 

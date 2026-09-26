@@ -1,12 +1,12 @@
+import { consola } from 'consola/browser'
 import { useCallback, useLayoutEffect, useRef, useState } from 'react'
 import { Navigate, useParams } from 'react-router'
-import { consola } from 'consola/browser'
+import { app } from 'src/config'
 
 import { useGetConfigProfile, useGetSnippets } from '@shared/api/hooks'
-import { fetchWithProgress } from '@shared/utils/fetch-with-progress'
 import { ROUTES } from '@shared/constants'
 import { LoadingScreen } from '@shared/ui'
-import { app } from 'src/config'
+import { fetchWithProgress } from '@shared/utils/fetch-with-progress'
 
 import { ConfigProfileByUuidPageComponent } from '../components/config-profile-by-uuid.page.component'
 
@@ -94,7 +94,7 @@ export function ConfigProfileByUuidPageConnector() {
     }
 
     if (isLoading || isConfigProfileLoading || !configProfile || isSnippetsLoading || !snippets) {
-        return <LoadingScreen text="WASM module is loading..." value={downloadProgress} />
+        return <LoadingScreen text="The WASM module is loading..." value={downloadProgress} />
     }
 
     return (

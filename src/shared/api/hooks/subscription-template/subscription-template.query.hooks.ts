@@ -1,15 +1,19 @@
+import { createQueryKeys } from '@lukemorales/query-key-factory'
 import {
     GetSubscriptionTemplateCommand,
-    GetSubscriptionTemplatesCommand
+    GetSubscriptionTemplatesCommand,
+    GetSubscriptionTemplatesTagsCommand
 } from '@remnawave/backend-contract'
-import { createQueryKeys } from '@lukemorales/query-key-factory'
 
 import { sToMs } from '@shared/utils/time-utils'
 
 import { createGetQueryHook, errorHandler } from '../../tsq-helpers'
 
 export const subscriptionTemplateQueryKeys = createQueryKeys('subscriptionTemplate', {
-    getSubscriptionTemplate: (route: GetSubscriptionTemplateCommand.Request) => ({
+    getSubscriptionTemplatesTags: {
+        queryKey: null
+    },
+    getSubscriptionTemplate: (route: GetSubscriptionTemplateCommand.RequestParam) => ({
         queryKey: [route]
     }),
     getSubscriptionTemplates: {
@@ -19,7 +23,7 @@ export const subscriptionTemplateQueryKeys = createQueryKeys('subscriptionTempla
 
 export const useGetSubscriptionTemplate = createGetQueryHook({
     endpoint: GetSubscriptionTemplateCommand.TSQ_url,
-    routeParamsSchema: GetSubscriptionTemplateCommand.RequestSchema,
+    routeParamsSchema: GetSubscriptionTemplateCommand.RequestParamSchema,
     responseSchema: GetSubscriptionTemplateCommand.ResponseSchema,
     getQueryKey: ({ route }) =>
         subscriptionTemplateQueryKeys.getSubscriptionTemplate(route!).queryKey,
@@ -39,4 +43,15 @@ export const useGetSubscriptionTemplates = createGetQueryHook({
         staleTime: sToMs(30)
     },
     errorHandler: (error) => errorHandler(error, 'Get Subscription Templates')
+})
+
+export const useGetSubscriptionTemplatesTags = createGetQueryHook({
+    endpoint: GetSubscriptionTemplatesTagsCommand.TSQ_url,
+    responseSchema: GetSubscriptionTemplatesTagsCommand.ResponseSchema,
+    getQueryKey: () => subscriptionTemplateQueryKeys.getSubscriptionTemplatesTags.queryKey,
+    rQueryParams: {
+        refetchOnMount: true,
+        staleTime: sToMs(30)
+    },
+    errorHandler: (error) => errorHandler(error, 'Get SubscriptionTemplates Tags')
 })

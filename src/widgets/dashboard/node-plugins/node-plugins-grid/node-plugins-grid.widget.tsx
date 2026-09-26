@@ -1,3 +1,8 @@
+import { Badge, Center, Group, Stack, Text, ThemeIcon } from '@mantine/core'
+import { modals } from '@mantine/modals'
+import { GetNodesCommand, GetNodePluginsCommand } from '@remnawave/backend-contract'
+import { useMemo } from 'react'
+import { useTranslation } from 'react-i18next'
 import {
     TbAlertTriangle,
     TbFlame,
@@ -6,10 +11,6 @@ import {
     TbPackage,
     TbPlugConnectedX
 } from 'react-icons/tb'
-import { GetAllNodesCommand, GetNodePluginsCommand } from '@remnawave/backend-contract'
-import { Badge, Center, Group, Stack, Text, ThemeIcon } from '@mantine/core'
-import { useTranslation } from 'react-i18next'
-import { modals } from '@mantine/modals'
 
 import {
     QueryKeys,
@@ -17,22 +18,32 @@ import {
     useDeleteNodePlugin,
     useReorderNodePlugins
 } from '@shared/api/hooks'
-import { BaseOverlayHeader } from '@shared/ui/overlays/base-overlay-header'
-import { VirtualizedDndGrid } from '@shared/ui/virtualized-dnd-grid'
 import { queryClient } from '@shared/api/query-client'
+import { filterByTag, TagFilterBar } from '@shared/ui'
+import { BaseOverlayHeader } from '@shared/ui/overlays/base-overlay-header'
 import { SectionCard } from '@shared/ui/section-card'
+import { VirtualizedDndGrid } from '@shared/ui/virtualized-dnd-grid'
+
+import {
+    useSectionActiveTag,
+    useViewPreferencesStoreActions
+} from '@entities/dashboard/view-preferences-store'
 
 import { ActivePluginsOnNodesModalShared } from '../active-on-nodes-modal/adtive-on-nodes.modal.shared'
 import { NodePluginCardWidget } from '../node-plugin-card/node-plugin-card.widget'
 
 interface IProps {
-    nodes: GetAllNodesCommand.Response['response']
+    nodes: GetNodesCommand.Response['response']
     plugins: GetNodePluginsCommand.Response['response']['nodePlugins']
 }
 
 export function NodePluginsGridWidget(props: IProps) {
     const { t } = useTranslation()
     const { nodes, plugins } = props
+
+    const activeTag = useSectionActiveTag('nodePlugins')
+    const { setSectionActiveTag } = useViewPreferencesStoreActions()
+    const visibleItems = useMemo(() => filterByTag(plugins ?? [], activeTag), [plugins, activeTag])
 
     const { mutate: deleteNodePlugin } = useDeleteNodePlugin({
         mutationFns: {
@@ -66,14 +77,14 @@ export function NodePluginsGridWidget(props: IProps) {
 
     const handleDeleteNodePlugin = (nodePluginUuid: string) => {
         modals.openConfirmModal({
-            title: t('common.confirm-action'),
-            children: t('common.confirm-action-description'),
+            title: t('common.action.confirm-action'),
+            children: t('common.message.confirm-action-description'),
             labels: {
-                confirm: t('common.delete'),
-                cancel: t('common.cancel')
+                confirm: t('common.action.delete'),
+                cancel: t('common.action.cancel')
             },
-            cancelProps: { variant: 'subtle', color: 'gray' },
-            confirmProps: { color: 'red' },
+            cancelProps: { variant: 'subtle' },
+            confirmProps: { color: 'red', variant: 'soft' },
             centered: true,
             onConfirm: () => {
                 deleteNodePlugin({
@@ -134,7 +145,7 @@ export function NodePluginsGridWidget(props: IProps) {
                         subtitle={t(
                             'node-plugins-grid.widget.node-plugins-are-an-advanced-feature-please-review-the-documentation-before-use'
                         )}
-                        title={t('node-plugins-grid.widget.warning')}
+                        title={t('common.message.warning')}
                         titleOrder={4}
                     />
                 </SectionCard.Section>
@@ -203,8 +214,15 @@ export function NodePluginsGridWidget(props: IProps) {
 
     return (
         <VirtualizedDndGrid
-            enableDnd={true}
-            items={plugins}
+            enableDnd={activeTag === null}
+            header={
+                <TagFilterBar
+                    activeTag={activeTag}
+                    items={plugins}
+                    onChange={(tag) => setSectionActiveTag('nodePlugins', tag)}
+                />
+            }
+            items={visibleItems}
             key={`node-plugins-grid-widget`}
             onReorder={handleReorder}
             renderDragOverlay={(nodePlugin) => (
@@ -218,6 +236,7 @@ export function NodePluginsGridWidget(props: IProps) {
             )}
             renderItem={(nodePlugin) => (
                 <NodePluginCardWidget
+                    disableReordering={activeTag !== null}
                     handleCloneNodePlugin={handleCloneNodePlugin}
                     handleDeleteNodePlugin={handleDeleteNodePlugin}
                     handleShowActiveNodes={handleShowActiveNodes}

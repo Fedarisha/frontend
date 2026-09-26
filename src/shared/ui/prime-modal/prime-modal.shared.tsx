@@ -1,3 +1,4 @@
+import { Button, Group, Stack, Text, Title } from '@mantine/core'
 import {
     IconCrownFilled,
     IconHeadset,
@@ -5,7 +6,6 @@ import {
     IconRoute,
     IconUsersGroup
 } from '@tabler/icons-react'
-import { Button, Group, Stack, Text, Title } from '@mantine/core'
 import { useTranslation } from 'react-i18next'
 
 import classes from './PrimeModal.module.css'

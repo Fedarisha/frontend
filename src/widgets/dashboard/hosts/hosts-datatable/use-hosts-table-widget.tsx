@@ -1,22 +1,24 @@
+import { DataTableColumn } from '@kastov/mantine-datatable'
 import { ActionIcon, Group, MultiSelect, Text } from '@mantine/core'
-import { GetAllHostsCommand } from '@remnawave/backend-contract'
-import { TbEdit, TbEyeOff, TbSearch } from 'react-icons/tb'
-import { PiProhibit, PiPulse } from 'react-icons/pi'
-import { DataTableColumn } from 'mantine-datatable'
+import { GetHostsCommand } from '@remnawave/backend-contract'
 import { TFunction } from 'i18next'
+import { PiProhibit, PiPulse } from 'react-icons/pi'
+import { TbEdit, TbEyeOff, TbSearch } from 'react-icons/tb'
 
 import {
+    type BooleanFilterValue,
     BooleanCell,
     BooleanFilterControl,
     EllipsisCell,
     SelectFilter,
     TextSearchFilter
-} from './host-table-cells'
+} from '@shared/ui'
 
-export type HostType = GetAllHostsCommand.Response['response'][number]
+export type { BooleanFilterValue }
+
+export type HostType = GetHostsCommand.Response['response'][number]
 
 export type HostStatusFilter = 'disabled' | 'enabled' | 'hidden'
-export type BooleanFilterValue = 'all' | 'no' | 'yes'
 
 export interface HostTableContext {
     configProfileNameByUuid: Map<string, string>
@@ -80,13 +82,13 @@ export const HOST_TEXT_FIELDS: HostTextFieldConfig[] = [
         accessor: 'address',
         getValue: (host) => host.address,
         key: 'address',
-        label: (t) => t('base-host-form.address')
+        label: (t) => t('common.field.address')
     },
     {
         accessor: 'port',
         getValue: (host) => host.port,
         key: 'port',
-        label: (t) => t('base-host-form.port')
+        label: (t) => t('common.field.port')
     },
     {
         accessor: 'sni',
@@ -152,14 +154,14 @@ export const HOST_SELECT_FIELDS: HostSelectFieldConfig[] = [
         getValues: (host) =>
             host.inbound.configProfileInboundUuid ? [host.inbound.configProfileInboundUuid] : [],
         key: 'inbound',
-        label: (t) => t('use-nodes-table-widget.inbounds'),
+        label: (t) => t('common.field.inbounds'),
         valueLabel: (value, context) => context.inboundTagByUuid.get(value) ?? value
     },
     {
         accessor: 'tags',
         getValues: (host) => (host.tags && host.tags.length > 0 ? host.tags : []),
         key: 'tags',
-        label: (t) => t('use-nodes-table-widget.tags'),
+        label: (t) => t('common.field.tags'),
         sortable: true
     },
     {
@@ -210,12 +212,20 @@ export const HOST_SELECT_FIELDS: HostSelectFieldConfig[] = [
         valueLabel: (value, context) => context.nodeNameByUuid.get(value) ?? value
     },
     {
-        accessor: 'excludedInternalSquads',
-        getValues: (host) => host.excludedInternalSquads ?? [],
+        accessor: 'internalSquads.squads',
+        getValues: (host) => host.internalSquads?.squads ?? [],
         hiddenByDefault: true,
-        key: 'excludedInternalSquads',
-        label: (t) => t('base-host-form.excluded-internal-squads'),
+        key: 'internalSquads',
+        label: (t) => t('constants.internal-squads'),
         valueLabel: (value, context) => context.internalSquadNameByUuid.get(value) ?? value
+    },
+    {
+        accessor: 'internalSquads.mode',
+        getValues: (host) => (host.internalSquads?.mode ? [host.internalSquads.mode] : []),
+        hiddenByDefault: true,
+        key: 'internalSquadsMode',
+        label: (t) => t('base-host-form.override-type'),
+        sortable: true
     },
     {
         accessor: 'xrayJsonTemplateUuid',
@@ -282,10 +292,10 @@ export const HOST_BOOLEAN_FIELDS: HostBooleanFieldConfig[] = [
         label: () => 'Sockopt Params'
     },
     {
-        accessor: 'xHttpExtraParams',
-        getValue: (host) => Boolean(host.xHttpExtraParams),
+        accessor: 'xhttpExtraParams',
+        getValue: (host) => Boolean(host.xhttpExtraParams),
         hiddenByDefault: true,
-        key: 'xHttpExtraParams',
+        key: 'xhttpExtraParams',
         label: (t) => t('base-host-form.extra-xhttp')
     }
 ]
@@ -295,7 +305,7 @@ function buildTextColumn(
     t: TFunction,
     filters: HostsTableFilters
 ): DataTableColumn<HostType> {
-    const lockProps = cfg.primary ? { draggable: false, resizable: false, toggleable: false } : {}
+    const lockProps = cfg.primary ? { draggable: false, resizable: true, toggleable: false } : {}
 
     return {
         accessor: cfg.accessor,

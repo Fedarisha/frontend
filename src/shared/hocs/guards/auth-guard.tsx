@@ -1,12 +1,13 @@
-import { Navigate, Outlet, useLocation } from 'react-router'
 import { useLayoutEffect } from 'react'
+import { Navigate, Outlet, useLocation } from 'react-router'
 
-import { consumeReturnTo, saveReturnTo } from '@shared/utils/return-to.util'
-import { useUpdatesStoreActions } from '@entities/dashboard/updates-store'
-import { LoadingProgress } from '@shared/ui/loading-screen'
 import { useGetAuthStatus } from '@shared/api/hooks'
 import { ROUTES } from '@shared/constants/routes'
 import { useAuth } from '@shared/hooks'
+import { LoadingProgress } from '@shared/ui/loading-screen'
+import { consumeReturnTo, saveReturnTo } from '@shared/utils/return-to.util'
+
+import { useUpdatesStoreActions } from '@entities/dashboard/updates-store'
 
 export function AuthGuard() {
     const location = useLocation()

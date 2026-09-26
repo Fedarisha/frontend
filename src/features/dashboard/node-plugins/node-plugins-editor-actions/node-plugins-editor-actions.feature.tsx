@@ -1,27 +1,29 @@
 import type { editor } from 'monaco-editor'
 
+import { ActionIcon, Button, Group, Menu } from '@mantine/core'
+import { useClipboard, useDisclosure } from '@mantine/hooks'
+import { notifications } from '@mantine/notifications'
+import { Monaco } from '@monaco-editor/react'
+import { UpdateNodePluginCommand } from '@remnawave/backend-contract'
+import consola from 'consola/browser'
+import { RefObject } from 'react'
+import { useTranslation } from 'react-i18next'
+import { PiCheckSquareOffset, PiFloppyDisk } from 'react-icons/pi'
 import {
     TbClipboardCopy,
     TbClipboardText,
     TbCut,
     TbDownload,
     TbMenuDeep,
+    TbPackage,
     TbSelectAll
 } from 'react-icons/tb'
-import { UpdateNodePluginCommand } from '@remnawave/backend-contract'
-import { PiCheckSquareOffset, PiFloppyDisk } from 'react-icons/pi'
-import { ActionIcon, Button, Group, Menu } from '@mantine/core'
-import { useClipboard, useDisclosure } from '@mantine/hooks'
-import { notifications } from '@mantine/notifications'
-import { useTranslation } from 'react-i18next'
-import { Monaco } from '@monaco-editor/react'
-import consola from 'consola/browser'
-import { RefObject } from 'react'
 
-import { useDownloadTemplate } from '@shared/ui/load-templates/use-download-template'
-import { QueryKeys, useUpdateNodePlugin } from '@shared/api/hooks'
-import { useIsMobile } from '@shared/hooks'
+import { openApplyToNodesModal } from '@shared/_modals/universal'
 import { queryClient } from '@shared/api'
+import { QueryKeys, useSyncNodePlugin, useUpdateNodePlugin } from '@shared/api/hooks'
+import { useIsMobile } from '@shared/hooks'
+import { useDownloadTemplate } from '@shared/ui/load-templates/use-download-template'
 
 interface Props {
     editorRef: RefObject<editor.IStandaloneCodeEditor | null>
@@ -54,6 +56,16 @@ export function NodePluginsEditorActionsFeature(props: Props) {
     const clipboard = useClipboard({ timeout: 500 })
     const [opened, handlers] = useDisclosure(false)
 
+    const { mutate: syncNodePlugin } = useSyncNodePlugin()
+
+    const openSyncChoiceModal = () => {
+        openApplyToNodesModal({
+            IconComponent: TbPackage,
+            iconColor: 'grape',
+            onApply: () => syncNodePlugin({ variables: { uuid: pluginUuid } })
+        })
+    }
+
     const { mutate: updateNodePluginRes, isPending: isUpdating } = useUpdateNodePlugin({
         mutationFns: {
             onSuccess: async (updatedNodePlugin: UpdateNodePluginCommand.Response['response']) => {
@@ -76,6 +88,8 @@ export function NodePluginsEditorActionsFeature(props: Props) {
                 )
 
                 setHasUnsavedChanges(false)
+
+                openSyncChoiceModal()
             },
             onError: (error) => {
                 setIsNodePluginValid(false)
@@ -103,7 +117,7 @@ export function NodePluginsEditorActionsFeature(props: Props) {
             notifications.show({
                 color: 'red',
                 message: t('config-editor-actions.feature.failed-to-save-invalid-json'),
-                title: t('config-editor-actions.feature.error')
+                title: t('common.message.error')
             })
             return
         }
@@ -188,8 +202,9 @@ export function NodePluginsEditorActionsFeature(props: Props) {
                 leftSection={<PiFloppyDisk size={16} />}
                 loading={isUpdating}
                 onClick={handleSave}
+                variant="soft"
             >
-                {t('common.save')}
+                {t('common.action.save')}
             </Button>
 
             <Group gap={0} wrap="nowrap">
@@ -226,7 +241,7 @@ export function NodePluginsEditorActionsFeature(props: Props) {
                             leftSection={<TbSelectAll size={14} />}
                             onClick={handleSelectAll}
                         >
-                            {t('config-editor-actions.feature.select-all')}
+                            {t('common.action.select-all')}
                         </Menu.Item>
 
                         <Menu.Item leftSection={<TbCut size={14} />} onClick={handleCut}>
@@ -246,7 +261,7 @@ export function NodePluginsEditorActionsFeature(props: Props) {
                             leftSection={<TbDownload size={14} />}
                             onClick={openDownloadModal}
                         >
-                            {t('config-editor-actions.feature.load-from-github')}
+                            {t('common.action.load-from-github')}
                         </Menu.Item>
                     </Menu.Dropdown>
                 </Menu>

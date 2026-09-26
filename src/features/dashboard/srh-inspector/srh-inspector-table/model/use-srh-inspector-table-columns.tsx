@@ -1,12 +1,13 @@
+import { MRT_ColumnDef } from '@kastov/mantine-react-table-open'
 /* eslint-disable camelcase */
 import { GetSubscriptionRequestHistoryCommand } from '@remnawave/backend-contract'
-import { MRT_ColumnDef } from '@kastov/mantine-react-table-open'
-import { useTranslation } from 'react-i18next'
 import { useMemo } from 'react'
-import dayjs from 'dayjs'
+import { useTranslation } from 'react-i18next'
+
+import { formatTimeUtil } from '@shared/utils/time-utils'
 
 export const useSrhInspectorTableColumns = () => {
-    const { t } = useTranslation()
+    const { t, i18n } = useTranslation()
 
     return useMemo<
         MRT_ColumnDef<
@@ -27,21 +28,38 @@ export const useSrhInspectorTableColumns = () => {
             },
             {
                 accessorKey: 'userAgent',
-                header: t('use-srh-inspector-table-columns.user-agent'),
+                header: t('common.field.user-agent'),
                 accessorFn: (originalRow) => originalRow.userAgent || '–',
                 size: 400
             },
             {
                 accessorKey: 'requestAt',
-                header: t('use-srh-inspector-table-columns.request-at'),
+                header: t('common.field.request-at'),
                 accessorFn: (originalRow) =>
-                    dayjs(originalRow.requestAt).format('DD/MM/YYYY, HH:mm'),
+                    formatTimeUtil({
+                        time: originalRow.requestAt,
+                        template: 'TIME_FIRST_DATETIME',
+                        language: i18n.language
+                    }),
                 minSize: 250,
                 enableColumnFilterModes: false,
                 enableColumnFilter: false,
                 mantineTableBodyCellProps: {
-                    align: 'center'
+                    align: 'left',
+                    ff: 'monospace'
                 }
+            },
+            {
+                accessorKey: 'srrResponseType',
+                header: t('use-srh-inspector-table-columns.response-type'),
+                accessorFn: (originalRow) => originalRow.srrResponseType,
+                size: 200
+            },
+            {
+                accessorKey: 'srrRuleName',
+                header: t('use-srh-inspector-table-columns.rule-name'),
+                accessorFn: (originalRow) => originalRow.srrRuleName || '–',
+                size: 200
             },
             {
                 accessorKey: 'id',
@@ -50,6 +68,6 @@ export const useSrhInspectorTableColumns = () => {
                 size: 80
             }
         ],
-        [t]
+        [t, i18n.language]
     )
 }

@@ -8,27 +8,28 @@ import {
     Stack,
     Text
 } from '@mantine/core'
+import { UseFormReturnType } from '@mantine/form'
 import { CreateNodeCommand, UpdateNodeCommand } from '@remnawave/backend-contract'
 import { ForwardRefComponent, HTMLMotionProps, Variants } from 'motion/react'
-import { TbChartLine, TbMinus, TbPlus } from 'react-icons/tb'
-import { HiQuestionMarkCircle } from 'react-icons/hi'
-import { UseFormReturnType } from '@mantine/form'
-import { useTranslation } from 'react-i18next'
 import { useRef } from 'react'
+import { useTranslation } from 'react-i18next'
+import { HiQuestionMarkCircle } from 'react-icons/hi'
+import { TbChartLine, TbMinus, TbPlus } from 'react-icons/tb'
 
 import { BaseOverlayHeader } from '@shared/ui/overlays/base-overlay-header'
 import { SectionCard } from '@shared/ui/section-card'
 
 interface IProps {
     cardVariants: Variants
-    form: UseFormReturnType<CreateNodeCommand.Request | UpdateNodeCommand.Request>
+    form: UseFormReturnType<CreateNodeCommand.RequestBody | UpdateNodeCommand.RequestBody>
     motionWrapper: ForwardRefComponent<HTMLDivElement, HTMLMotionProps<'div'>>
 }
 
 export const NodeConsumptionCard = (props: IProps) => {
     const { t } = useTranslation()
     const { cardVariants, form, motionWrapper } = props
-    const handlersRef = useRef<NumberInputHandlers>(null)
+    const consumptionMultiplierRef = useRef<NumberInputHandlers>(null)
+    const nodeConsumptionRef = useRef<NumberInputHandlers>(null)
 
     const MotionWrapper = motionWrapper
 
@@ -53,13 +54,13 @@ export const NodeConsumptionCard = (props: IProps) => {
                             clampBehavior="strict"
                             decimalScale={1}
                             fixedDecimalScale
-                            handlersRef={handlersRef}
+                            handlersRef={consumptionMultiplierRef}
                             hideControls
                             key={form.key('consumptionMultiplier')}
                             leftSection={
                                 <ActionIcon
                                     color="red"
-                                    onClick={() => handlersRef.current?.decrement()}
+                                    onClick={() => consumptionMultiplierRef.current?.decrement()}
                                     radius="md"
                                     size={rem(44)}
                                     variant="light"
@@ -79,7 +80,7 @@ export const NodeConsumptionCard = (props: IProps) => {
                             rightSection={
                                 <ActionIcon
                                     color="teal"
-                                    onClick={() => handlersRef.current?.increment()}
+                                    onClick={() => consumptionMultiplierRef.current?.increment()}
                                     radius="md"
                                     size={rem(44)}
                                     variant="light"
@@ -135,13 +136,13 @@ export const NodeConsumptionCard = (props: IProps) => {
                             clampBehavior="strict"
                             decimalScale={1}
                             fixedDecimalScale
-                            handlersRef={handlersRef}
+                            handlersRef={nodeConsumptionRef}
                             hideControls
                             key={form.key('nodeConsumptionMultiplier')}
                             leftSection={
                                 <ActionIcon
                                     color="red"
-                                    onClick={() => handlersRef.current?.decrement()}
+                                    onClick={() => nodeConsumptionRef.current?.decrement()}
                                     radius="md"
                                     size={rem(44)}
                                     variant="light"
@@ -161,7 +162,7 @@ export const NodeConsumptionCard = (props: IProps) => {
                             rightSection={
                                 <ActionIcon
                                     color="teal"
-                                    onClick={() => handlersRef.current?.increment()}
+                                    onClick={() => nodeConsumptionRef.current?.increment()}
                                     radius="md"
                                     size={rem(44)}
                                     variant="light"

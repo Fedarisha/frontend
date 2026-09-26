@@ -1,7 +1,7 @@
 import {
+    Box,
     Button,
     Collapse,
-    Divider,
     Group,
     NumberInput,
     Stack,
@@ -10,19 +10,22 @@ import {
     Text,
     Textarea
 } from '@mantine/core'
+import { UseFormReturnType } from '@mantine/form'
 import { CreateNodeCommand, UpdateNodeCommand } from '@remnawave/backend-contract'
 import { ForwardRefComponent, HTMLMotionProps, Variants } from 'motion/react'
-import { TbChartBar, TbChartLine, TbExternalLink } from 'react-icons/tb'
-import { UseFormReturnType } from '@mantine/form'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { PiTagDuotone } from 'react-icons/pi'
-import { useState } from 'react'
+import { TbBell, TbChartBar, TbChartLine, TbClock, TbExternalLink } from 'react-icons/tb'
 
+import { useGetNodesTags } from '@shared/api/hooks'
+import { TrafficLimitInput } from '@shared/ui/forms/traffic-limit-input'
 import { SelectInfraProviderShared } from '@shared/ui/infra-billing/select-infra-provider/select-infra-provider.shared'
 import { BaseOverlayHeader } from '@shared/ui/overlays/base-overlay-header'
-import { TagInputPill } from '@shared/ui/tag-input-pill'
 import { SectionCard } from '@shared/ui/section-card'
-import { useGetNodesTags } from '@shared/api/hooks'
+import { TagInputPill } from '@shared/ui/tag-input-pill'
+
+import classes from './node-tracking-and-billing.card.module.css'
 
 const URL_REGEX = /https?:\/\/[^\s]+/i
 
@@ -31,14 +34,14 @@ function extractFirstUrl(text: string): null | string {
     return match ? match[0] : null
 }
 
-interface IProps<T extends CreateNodeCommand.Request | UpdateNodeCommand.Request> {
+interface IProps<T extends CreateNodeCommand.RequestBody | UpdateNodeCommand.RequestBody> {
     cardVariants: Variants
     form: UseFormReturnType<T>
     motionWrapper: ForwardRefComponent<HTMLDivElement, HTMLMotionProps<'div'>>
 }
 
 export const NodeTrackingAndBillingCard = <
-    T extends CreateNodeCommand.Request | UpdateNodeCommand.Request
+    T extends CreateNodeCommand.RequestBody | UpdateNodeCommand.RequestBody
 >(
     props: IProps<T>
 ) => {
@@ -76,20 +79,16 @@ export const NodeTrackingAndBillingCard = <
                         <SelectInfraProviderShared
                             selectedInfraProviderUuid={form.getValues().providerUuid}
                             setSelectedInfraProviderUuid={(providerUuid) => {
-                                form.setValues({
-                                    providerUuid
-                                } as Partial<T>)
-                                form.setTouched({
-                                    providerUuid: true
-                                })
-                                form.setDirty({
-                                    providerUuid: true
-                                })
+                                form.setFieldValue('providerUuid', providerUuid as never)
                             }}
                         />
 
-                        <Stack gap={0}>
-                            <Group gap="xs" justify="space-between">
+                        <Box className={classes.trackingCard}>
+                            <Group
+                                className={classes.trackingHeader}
+                                gap="xs"
+                                justify="space-between"
+                            >
                                 <Group gap="xs">
                                     <TbChartLine
                                         size={18}
@@ -115,37 +114,21 @@ export const NodeTrackingAndBillingCard = <
                             </Group>
 
                             <Collapse expanded={advancedOpened}>
-                                <Stack gap="sm" mt="sm">
-                                    <Divider size="xs" />
+                                <Stack className={classes.trackingBody} gap="sm">
                                     <Group gap="md" grow justify="space-between" w="100%">
-                                        <NumberInput
-                                            allowDecimal={false}
-                                            decimalScale={0}
-                                            defaultValue={0}
+                                        <TrafficLimitInput
                                             hideControls
                                             key={form.key('trafficLimitBytes')}
                                             label={t('base-node-form.limit')}
-                                            leftSection={
-                                                <>
-                                                    <Text
-                                                        display="flex"
-                                                        size="0.75rem"
-                                                        style={{ justifyContent: 'center' }}
-                                                        ta="center"
-                                                        w={26}
-                                                    >
-                                                        GiB
-                                                    </Text>
-                                                    <Divider orientation="vertical" />
-                                                </>
-                                            }
-                                            thousandSeparator=","
+                                            leftSection={<TbChartLine size={16} />}
                                             {...form.getInputProps('trafficLimitBytes')}
                                             styles={{
                                                 label: { fontWeight: 500 }
                                             }}
                                         />
+                                    </Group>
 
+                                    <Group gap="md" grow justify="space-between" w="100%">
                                         <NumberInput
                                             key={form.key('trafficResetDay')}
                                             label={t('base-node-form.reset-day')}
@@ -155,6 +138,7 @@ export const NodeTrackingAndBillingCard = <
                                             clampBehavior="strict"
                                             decimalScale={0}
                                             hideControls
+                                            leftSection={<TbClock size={16} />}
                                             max={31}
                                             min={1}
                                             placeholder={t('base-node-form.e-g-1-31')}
@@ -172,6 +156,7 @@ export const NodeTrackingAndBillingCard = <
                                             clampBehavior="strict"
                                             decimalScale={0}
                                             hideControls
+                                            leftSection={<TbBell size={16} />}
                                             max={100}
                                             placeholder={t('base-node-form.e-g-50')}
                                             styles={{
@@ -185,13 +170,13 @@ export const NodeTrackingAndBillingCard = <
                                     </Group>
                                 </Stack>
                             </Collapse>
-                        </Stack>
+                        </Box>
 
                         <TagsInput
                             clearable
                             data={nodesTags?.tags || []}
                             key={form.key('tags')}
-                            label={t('use-nodes-table-widget.tags')}
+                            label={t('common.field.tags')}
                             leftSection={<PiTagDuotone size="16px" />}
                             maxTags={10}
                             placeholder="Enter tags (comma, space, semicolon)"
@@ -230,7 +215,7 @@ export const NodeTrackingAndBillingCard = <
                                     variant="soft"
                                     w="fit-content"
                                 >
-                                    {t('common.open')}
+                                    {t('common.action.open')}
                                 </Button>
                             )}
                         </Stack>

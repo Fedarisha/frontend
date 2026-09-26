@@ -1,6 +1,6 @@
 import { Anchor, Button, Divider, List, Modal, Stack, Text, ThemeIcon, Title } from '@mantine/core'
-import { PiCheckCircle, PiGavel, PiScales, PiShieldWarning } from 'react-icons/pi'
 import { Trans, useTranslation } from 'react-i18next'
+import { PiCheckCircle, PiGavel, PiShieldWarning } from 'react-icons/pi'
 
 import { useDisclaimerAccepted, useMiscStoreActions } from '@entities/dashboard/misc-store'
 
@@ -127,11 +127,6 @@ export function DisclaimerOverlay() {
                 >
                     {t('disclaimer-overlay.accept-button')}
                 </Button>
-
-                <Text c="gray.6" size="xs" ta="center">
-                    <PiScales size="11px" style={{ verticalAlign: 'middle' }} />{' '}
-                    {t('disclaimer-overlay.shown-once')}
-                </Text>
             </Stack>
         </Modal>
     )

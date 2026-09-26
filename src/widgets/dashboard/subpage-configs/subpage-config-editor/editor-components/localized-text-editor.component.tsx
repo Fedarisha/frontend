@@ -9,13 +9,13 @@ import {
     TextInput,
     UnstyledButton
 } from '@mantine/core'
+import { useDisclosure } from '@mantine/hooks'
 import {
     getLanguageName,
     TSubscriptionPageLanguageCode,
     TSubscriptionPageLocalizedText
 } from '@remnawave/subscription-page-types'
 import { IconLanguage } from '@tabler/icons-react'
-import { useDisclosure } from '@mantine/hooks'
 import { useTranslation } from 'react-i18next'
 
 import { BaseOverlayHeader } from '@shared/ui/overlays/base-overlay-header'
@@ -45,7 +45,7 @@ export function LocalizedTextEditor(props: IProps) {
     const filledCount = enabledLocales.filter((locale) => value[locale]?.trim()).length
     const previewLocale = enabledLocales[0]
     const previewText =
-        (previewLocale && value[previewLocale]) || t('localized-text-editor.component.not-set')
+        (previewLocale && value[previewLocale]) || t('common.message.not-set')
 
     return (
         <>

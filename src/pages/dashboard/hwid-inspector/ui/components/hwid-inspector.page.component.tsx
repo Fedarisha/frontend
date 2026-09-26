@@ -1,18 +1,13 @@
-import { useTranslation } from 'react-i18next'
-import { useMediaQuery } from '@mantine/hooks'
-import { motion } from 'framer-motion'
 import { Stack } from '@mantine/core'
-
-import { UserTorrentBlockerReportsDrawerWidget } from '@widgets/dashboard/users/user-torrent-blocker-reports/user-torrent-blocker-reports.drawer.widget'
-import { UserAccessibleNodesModalWidget } from '@widgets/dashboard/users/user-accessible-nodes-modal/user-accessible-nodes.modal.widget'
-import { DetailedUserInfoDrawerWidget } from '@widgets/dashboard/users/detailed-user-info-drawer/detailed-user-info-drawer.widget'
+import { useMediaQuery } from '@mantine/hooks'
 import { HwidInspectorLeaderboardWidget } from '@widgets/dashboard/hwid-inspector/hwid-inspector-leaderboard'
-import { InternalSquadsDrawerWithStore } from '@widgets/dashboard/users/internal-squads-drawer-with-store'
+import { HwidInspectorMetrics } from '@widgets/dashboard/hwid-inspector/hwid-inspector-metrics'
 import { HwidInspectorTableWidget } from '@widgets/dashboard/hwid-inspector/hwid-inspector-table'
-import { MobileWarningOverlay } from '@shared/ui/mobile-warning-overlay/mobile-warning-overlay'
-import { HwidInspectorMetrics } from '@widgets/dashboard/users/hwid-inspector-metrics'
-import { ViewUserModal } from '@widgets/dashboard/users/view-user-modal'
+import { motion } from 'framer-motion'
+import { useTranslation } from 'react-i18next'
+
 import { Page } from '@shared/ui'
+import { MobileWarningOverlay } from '@shared/ui/mobile-warning-overlay/mobile-warning-overlay'
 
 export default function HwidInspectorPageComponent() {
     const { t } = useTranslation()
@@ -40,12 +35,6 @@ export default function HwidInspectorPageComponent() {
                     <HwidInspectorTableWidget />
                 </motion.div>
             </Stack>
-
-            <ViewUserModal key="view-user-modal" />
-            <DetailedUserInfoDrawerWidget key="detailed-user-info-drawer" />
-            <UserAccessibleNodesModalWidget key="user-accessible-nodes-modal" />
-            <InternalSquadsDrawerWithStore key="internal-squads-drawer-with-store" />
-            <UserTorrentBlockerReportsDrawerWidget key="user-torrent-blocker-reports-drawer" />
         </Page>
     )
 }

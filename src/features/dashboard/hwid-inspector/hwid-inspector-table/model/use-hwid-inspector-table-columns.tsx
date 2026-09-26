@@ -1,16 +1,15 @@
-/* eslint-disable camelcase */
-import { GetAllHwidDevicesCommand } from '@remnawave/backend-contract'
 import { MRT_ColumnDef } from '@kastov/mantine-react-table-open'
-import { useTranslation } from 'react-i18next'
+/* eslint-disable camelcase */
+import { GetHwidDevicesCommand } from '@remnawave/backend-contract'
 import { useMemo } from 'react'
-import dayjs from 'dayjs'
+import { useTranslation } from 'react-i18next'
+
+import { formatTimeUtil } from '@shared/utils/time-utils'
 
 export const useHwidInspectorTableColumns = () => {
-    const { t } = useTranslation()
+    const { t, i18n } = useTranslation()
 
-    return useMemo<
-        MRT_ColumnDef<GetAllHwidDevicesCommand.Response['response']['devices'][number]>[]
-    >(
+    return useMemo<MRT_ColumnDef<GetHwidDevicesCommand.Response['response']['devices'][number]>[]>(
         () => [
             {
                 accessorKey: 'userId',
@@ -31,12 +30,12 @@ export const useHwidInspectorTableColumns = () => {
             },
             {
                 accessorKey: 'platform',
-                header: t('use-hwid-inspector-table-columns.platform'),
+                header: t('common.field.platform'),
                 accessorFn: (originalRow) => originalRow.platform || '–'
             },
             {
                 accessorKey: 'osVersion',
-                header: t('use-hwid-inspector-table-columns.os-version'),
+                header: t('common.field.os-version'),
                 accessorFn: (originalRow) => originalRow.osVersion || '–',
                 size: 100
             },
@@ -47,30 +46,47 @@ export const useHwidInspectorTableColumns = () => {
             },
             {
                 accessorKey: 'userAgent',
-                header: t('use-hwid-inspector-table-columns.user-agent'),
+                header: t('common.field.user-agent'),
                 accessorFn: (originalRow) => originalRow.userAgent || '–',
                 size: 500
             },
 
             {
                 accessorKey: 'createdAt',
-                header: t('use-hwid-inspector-table-columns.created-at'),
+                header: t('common.field.created-at'),
                 accessorFn: (originalRow) =>
-                    dayjs(originalRow.createdAt).format('DD/MM/YYYY, HH:mm'),
+                    formatTimeUtil({
+                        time: originalRow.createdAt,
+                        template: 'TIME_FIRST_DATETIME',
+                        language: i18n.language
+                    }),
+
                 minSize: 250,
                 enableColumnFilter: false,
-                enableColumnFilterModes: false
+                enableColumnFilterModes: false,
+                mantineTableBodyCellProps: {
+                    align: 'left',
+                    ff: 'monospace'
+                }
             },
             {
                 accessorKey: 'updatedAt',
-                header: t('use-hwid-inspector-table-columns.updated-at'),
+                header: t('common.field.updated-at'),
                 accessorFn: (originalRow) =>
-                    dayjs(originalRow.updatedAt).format('DD/MM/YYYY, HH:mm'),
+                    formatTimeUtil({
+                        time: originalRow.updatedAt,
+                        template: 'TIME_FIRST_DATETIME',
+                        language: i18n.language
+                    }),
                 minSize: 250,
                 enableColumnFilter: false,
-                enableColumnFilterModes: false
+                enableColumnFilterModes: false,
+                mantineTableBodyCellProps: {
+                    align: 'left',
+                    ff: 'monospace'
+                }
             }
         ],
-        [t]
+        [t, i18n.language]
     )
 }

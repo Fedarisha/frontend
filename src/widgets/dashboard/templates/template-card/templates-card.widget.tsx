@@ -1,28 +1,28 @@
-import { GetSubscriptionTemplatesCommand } from '@remnawave/backend-contract'
-import { PiCheck, PiCopy, PiPencil, PiTrashDuotone } from 'react-icons/pi'
-import { generatePath, useNavigate } from 'react-router'
 import { CopyButton, Menu } from '@mantine/core'
-import { useTranslation } from 'react-i18next'
-import { TbEdit } from 'react-icons/tb'
+import { GetSubscriptionTemplatesCommand } from '@remnawave/backend-contract'
 import { ReactNode } from 'react'
+import { useTranslation } from 'react-i18next'
+import { PiCheck, PiCopy, PiPencil, PiTrashDuotone } from 'react-icons/pi'
+import { TbTags } from 'react-icons/tb'
+import { generatePath, useNavigate } from 'react-router'
 
-import { MODALS, useModalsStoreOpenWithData } from '@entities/dashboard/modal-store'
+import { showModal } from '@shared/_modals/show-modal'
+import { ROUTES } from '@shared/constants'
 import { WithDndSortable } from '@shared/hocs/with-dnd-sortable'
 import { EntityCardShared } from '@shared/ui/entity-card'
-import { ROUTES } from '@shared/constants'
 
 interface IProps {
+    disableReordering?: boolean
     handleDeleteTemplate: (templateUuid: string) => void
     isDragOverlay?: boolean
     template: GetSubscriptionTemplatesCommand.Response['response']['templates'][number]
-    templateTitle: string
     themeLogo: ReactNode
 }
 
 export function TemplatesCardWidget(props: IProps) {
     const {
+        disableReordering = false,
         template,
-        templateTitle,
         themeLogo,
         handleDeleteTemplate,
         isDragOverlay = false
@@ -30,48 +30,35 @@ export function TemplatesCardWidget(props: IProps) {
 
     const { t } = useTranslation()
 
-    const openModalWithData = useModalsStoreOpenWithData()
-
     const navigate = useNavigate()
+
+    const openTemplateEditor = () =>
+        navigate(
+            generatePath(ROUTES.DASHBOARD.TEMPLATES.TEMPLATE_EDITOR, {
+                type: template.templateType,
+                uuid: template.uuid
+            })
+        )
 
     return (
         <WithDndSortable
-            dragHandlePosition="top-right"
+            disableReordering={disableReordering}
+            dragHandlePosition="inline-end"
             id={template.uuid}
             isDragOverlay={isDragOverlay}
         >
-            <EntityCardShared.Root withTopAccent={template.name === 'Default'}>
+            <EntityCardShared.Root
+                isActive={template.name === 'Default'}
+                onClick={openTemplateEditor}
+            >
                 <EntityCardShared.Header>
-                    <EntityCardShared.Icon
-                        highlight={template.name === 'Default'}
-                        onClick={() =>
-                            navigate(
-                                generatePath(ROUTES.DASHBOARD.TEMPLATES.TEMPLATE_EDITOR, {
-                                    type: template.templateType,
-                                    uuid: template.uuid
-                                })
-                            )
-                        }
-                    >
+                    <EntityCardShared.Icon highlight={template.name === 'Default'}>
                         {themeLogo}
                     </EntityCardShared.Icon>
-                    <EntityCardShared.Content subtitle={templateTitle} title={template.name} />
+                    <EntityCardShared.Content tags={template.tags} title={template.name} />
                 </EntityCardShared.Header>
 
                 <EntityCardShared.Actions>
-                    <EntityCardShared.Button
-                        leftSection={<TbEdit size={16} />}
-                        onClick={() =>
-                            navigate(
-                                generatePath(ROUTES.DASHBOARD.TEMPLATES.TEMPLATE_EDITOR, {
-                                    type: template.templateType,
-                                    uuid: template.uuid
-                                })
-                            )
-                        }
-                    >
-                        {t('common.edit')}
-                    </EntityCardShared.Button>
                     <EntityCardShared.Menu>
                         <CopyButton timeout={2000} value={template.uuid}>
                             {({ copied, copy }) => (
@@ -82,7 +69,7 @@ export function TemplatesCardWidget(props: IProps) {
                                     }
                                     onClick={copy}
                                 >
-                                    {t('common.copy-uuid')}
+                                    {t('common.action.copy-uuid')}
                                 </Menu.Item>
                             )}
                         </CopyButton>
@@ -91,13 +78,30 @@ export function TemplatesCardWidget(props: IProps) {
                             disabled={template.name === 'Default'}
                             leftSection={<PiPencil size={18} />}
                             onClick={() => {
-                                openModalWithData(MODALS.RENAME_SQUAD_OR_CONFIG_PROFILE_MODAL, {
+                                showModal('renameModal', {
+                                    renameFrom: 'template',
                                     name: template.name,
                                     uuid: template.uuid
                                 })
                             }}
                         >
-                            {t('common.rename')}
+                            {t('common.action.rename')}
+                        </Menu.Item>
+
+                        <Menu.Item
+                            leftSection={<TbTags size={18} />}
+
+                            onClick={() => {
+                                showModal('editTagsModal', {
+                                    editTagsFrom: 'template',
+
+                                    tags: template.tags,
+
+                                    uuid: template.uuid
+                                })
+                            }}
+                        >
+                            {t('common.field.tags')}
                         </Menu.Item>
 
                         <Menu.Item
@@ -109,7 +113,7 @@ export function TemplatesCardWidget(props: IProps) {
                                 handleDeleteTemplate(template.uuid)
                             }}
                         >
-                            {t('common.delete')}
+                            {t('common.action.delete')}
                         </Menu.Item>
                     </EntityCardShared.Menu>
                 </EntityCardShared.Actions>

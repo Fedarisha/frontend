@@ -1,14 +1,14 @@
-import { BulkDeleteUsersByStatusCommand, TUsersStatus } from '@remnawave/backend-contract'
-import { TbCheck as IconCheck, TbX as IconX } from 'react-icons/tb'
 import { Button, Group, Select, Stack } from '@mantine/core'
-import { notifications } from '@mantine/notifications'
-import { PiClockDuotone } from 'react-icons/pi'
-import { useTranslation } from 'react-i18next'
 import { modals } from '@mantine/modals'
+import { notifications } from '@mantine/notifications'
+import { BulkDeleteUsersByStatusCommand, TUsersStatus } from '@remnawave/backend-contract'
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
+import { PiClockDuotone } from 'react-icons/pi'
+import { TbCheck as IconCheck, TbX as IconX } from 'react-icons/tb'
 
-import { userStatusValues } from '@shared/constants/forms/user-status.constants'
 import { useBulkDeleteUsersByStatus } from '@shared/api/hooks'
+import { userStatusValues } from '@shared/constants/forms/user-status.constants'
 
 export const DeleteAllUsersByStatusFeature = () => {
     const { t } = useTranslation()
@@ -18,7 +18,7 @@ export const DeleteAllUsersByStatusFeature = () => {
         mutationFns: {
             onMutate: () => {
                 const notificationId = notifications.show({
-                    title: t('delete-all-users-by-status.feature.processing'),
+                    title: t('common.message.processing'),
                     message: t('delete-all-users-by-status.feature.deleting-users'),
                     loading: true,
                     autoClose: false,
@@ -30,18 +30,13 @@ export const DeleteAllUsersByStatusFeature = () => {
 
                 return { notificationId }
             },
-            onSuccess: (data, _variables, context: unknown) => {
+            onSuccess: (_data, _variables, context: unknown) => {
                 if (context && typeof context === 'object' && 'notificationId' in context) {
                     notifications.update({
                         icon: <IconCheck size={18} />,
                         id: context.notificationId as string,
-                        title: t('delete-all-users-by-status.feature.success'),
-                        message: t(
-                            'delete-all-users-by-status.feature.deleted-data-affectedrows-users',
-                            {
-                                count: data.affectedRows
-                            }
-                        ),
+                        title: t('common.message.success'),
+                        message: t('common.message.operation-completed'),
                         color: 'teal',
                         loading: false,
                         autoClose: 2000
@@ -67,11 +62,11 @@ export const DeleteAllUsersByStatusFeature = () => {
 
     const confirmDeleteUsers = () =>
         modals.openConfirmModal({
-            title: t('common.confirm-action'),
-            children: t('common.confirm-action-description'),
+            title: t('common.action.confirm-action'),
+            children: t('common.message.confirm-action-description'),
             labels: {
-                confirm: t('common.delete'),
-                cancel: t('common.cancel')
+                confirm: t('common.action.delete'),
+                cancel: t('common.action.cancel')
             },
             centered: true,
             confirmProps: { color: 'red', variant: 'soft' },
@@ -85,15 +80,15 @@ export const DeleteAllUsersByStatusFeature = () => {
                 <Select
                     allowDeselect={false}
                     data={userStatusValues}
-                    description={t('bulk-user-actioins-modal.widget.user-deletion-description')}
-                    label={t('bulk-user-actioins-modal.widget.select-status')}
+                    description={t('bulk-user-actions-modal.widget.user-deletion-description')}
+                    label={t('bulk-user-actions-modal.widget.select-status')}
                     leftSection={<PiClockDuotone size="16px" />}
                     onChange={(value) => setSelectedStatus(value as TUsersStatus)}
-                    placeholder={t('bulk-user-actioins-modal.widget.select-status')}
+                    placeholder={t('bulk-user-actions-modal.widget.select-status')}
                     value={selectedStatus}
                 />
                 <Button color="red" disabled={!selectedStatus} onClick={confirmDeleteUsers}>
-                    {t('common.delete')}
+                    {t('common.action.delete')}
                 </Button>
             </Stack>
         </Group>

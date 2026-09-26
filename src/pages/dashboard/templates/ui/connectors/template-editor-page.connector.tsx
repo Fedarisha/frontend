@@ -2,8 +2,8 @@ import { SUBSCRIPTION_TEMPLATE_TYPE, TSubscriptionTemplateType } from '@remnawav
 import { useNavigate, useParams } from 'react-router'
 
 import { useGetHosts, useGetSubscriptionTemplate } from '@shared/api/hooks'
-import { LoadingScreen } from '@shared/ui'
 import { ROUTES } from '@shared/constants'
+import { LoadingScreen } from '@shared/ui'
 
 import { TemplateEditorPageComponent } from '../components/template-editor-page.component.'
 

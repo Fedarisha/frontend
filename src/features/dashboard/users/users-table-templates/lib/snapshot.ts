@@ -1,10 +1,9 @@
-/* eslint-disable camelcase */
 import { MRT_TableInstance } from '@kastov/mantine-react-table-open'
-import { GetAllUsersCommand } from '@remnawave/backend-contract'
+import { GetUsersCommand } from '@remnawave/backend-contract'
 
 import { UsersTableTemplateSnapshot } from '@entities/dashboard/users/users-table-templates-store'
 
-type UserRow = GetAllUsersCommand.Response['response']['users'][number]
+type UserRow = GetUsersCommand.Response['response']['users'][number]
 type UsersTable = MRT_TableInstance<UserRow>
 
 export const captureSnapshot = (table: UsersTable): UsersTableTemplateSnapshot => {
@@ -25,7 +24,6 @@ export const captureSnapshot = (table: UsersTable): UsersTableTemplateSnapshot =
 }
 
 export const applySnapshot = (table: UsersTable, snapshot: UsersTableTemplateSnapshot) => {
-    table.setShowColumnFilters(snapshot.showColumnFilters)
     table.setColumnVisibility(snapshot.columnVisibility)
     table.setColumnOrder(snapshot.columnOrder)
     table.setColumnPinning(snapshot.columnPinning)

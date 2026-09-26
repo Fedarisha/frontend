@@ -1,3 +1,4 @@
+import { Button, Card, Drawer, Stack, Text, TextInput } from '@mantine/core'
 import {
     TSubscriptionPageBlockConfig,
     TSubscriptionPageButtonConfig,
@@ -5,16 +6,15 @@ import {
     TSubscriptionPageSvgLibrary
 } from '@remnawave/subscription-page-types'
 import { IconChevronRight, IconPalette, IconPlus } from '@tabler/icons-react'
-import { Button, Card, Drawer, Stack, Text, TextInput } from '@mantine/core'
 import { useTranslation } from 'react-i18next'
 
 import { BaseOverlayHeader } from '@shared/ui/overlays/base-overlay-header'
 
-import { LocalizedTextEditor } from './localized-text-editor.component'
 import styles from '../subpage-config-visual-editor.module.css'
+import { ButtonEditor } from './button-editor.component'
+import { LocalizedTextEditor } from './localized-text-editor.component'
 import { SubpageTooltips } from './subpage-tooltips.component'
 import { SvgIconSelect } from './svg-icon-select.component'
-import { ButtonEditor } from './button-editor.component'
 
 interface IProps {
     block: null | TSubscriptionPageBlockConfig
@@ -135,7 +135,7 @@ export function BlockEditorModal(props: IProps) {
                             />
 
                             <SvgIconSelect
-                                label={t('block-editor.modal.component.svg-icon')}
+                                label={t('common.field.svg-icon')}
                                 onChange={(svgIconKey) => onChange({ ...block, svgIconKey })}
                                 svgLibrary={svgLibrary}
                                 value={block.svgIconKey}
@@ -168,7 +168,7 @@ export function BlockEditorModal(props: IProps) {
 
                             <LocalizedTextEditor
                                 enabledLocales={enabledLocales}
-                                label={t('block-editor.modal.component.description')}
+                                label={t('common.field.description')}
                                 multiline
                                 onChange={(description) => onChange({ ...block, description })}
                                 value={block.description}

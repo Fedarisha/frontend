@@ -1,8 +1,8 @@
-import { Box, Button, ColorPicker, Group, Stack } from '@mantine/core'
+import { Box, Button, ColorPicker, Grid, Group, Stack } from '@mantine/core'
 import { notifications } from '@mantine/notifications'
-import { TbCopy, TbDownload } from 'react-icons/tb'
-import { useTranslation } from 'react-i18next'
 import { useRef, useState } from 'react'
+import { useTranslation } from 'react-i18next'
+import { TbCopy, TbDownload } from 'react-icons/tb'
 import { renderSVG } from 'uqr'
 
 import {
@@ -75,10 +75,16 @@ export function QrCodeBuilder({ data, title }: IProps) {
         if (!qrRef.current) return
         setCopying(true)
         try {
-            await new Promise<void>((resolve) => {
-                requestAnimationFrame(() => requestAnimationFrame(() => resolve()))
-            })
-            await copyScreenshotToClipboard(qrRef.current)
+            await copyScreenshotToClipboard(
+                async () => {
+                    await new Promise<void>((resolve) => {
+                        requestAnimationFrame(() => requestAnimationFrame(() => resolve()))
+                    })
+                    if (!qrRef.current) throw new Error('qrRef')
+                    return qrRef.current
+                },
+                title ? `qr-${title}.png` : 'qr-code.png'
+            )
         } catch (error) {
             notifications.show({
                 color: 'red',
@@ -172,7 +178,7 @@ export function QrCodeBuilder({ data, title }: IProps) {
                         size="sm"
                         variant="filled"
                     >
-                        {t('common.copy')}
+                        {t('common.action.copy')}
                     </Button>
                     <Button
                         fullWidth
@@ -183,7 +189,7 @@ export function QrCodeBuilder({ data, title }: IProps) {
                         size="sm"
                         variant="default"
                     >
-                        {t('common.download')}
+                        {t('common.action.download')}
                     </Button>
                 </Group>
             )}
@@ -191,18 +197,13 @@ export function QrCodeBuilder({ data, title }: IProps) {
     )
 
     return (
-        <Group align="flex-start" gap="md" justify="center" wrap="nowrap">
-            <Box hiddenFrom="sm" w="100%">
-                <Stack gap="md">
-                    {centerPreview}
-                    {leftControls}
-                </Stack>
-            </Box>
-
-            <Group align="flex-start" gap="md" justify="center" visibleFrom="sm" wrap="nowrap">
+        <Grid align="flex-start" gap="md" justify="center">
+            <Grid.Col order={{ base: 2, sm: 1 }} span={{ base: 12, sm: 'content' }}>
                 {leftControls}
+            </Grid.Col>
+            <Grid.Col order={{ base: 1, sm: 2 }} span={{ base: 12, sm: 'auto' }}>
                 {centerPreview}
-            </Group>
-        </Group>
+            </Grid.Col>
+        </Grid>
     )
 }

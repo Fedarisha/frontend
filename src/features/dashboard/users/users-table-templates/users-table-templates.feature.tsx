@@ -1,18 +1,19 @@
 import { ActionIcon, ColorSwatch, Menu, Tooltip } from '@mantine/core'
-import { TbBookmark, TbPlus, TbTrash } from 'react-icons/tb'
-import { useTranslation } from 'react-i18next'
 import { modals } from '@mantine/modals'
+import { useTranslation } from 'react-i18next'
+import { TbBookmark, TbPlus, TbTrash } from 'react-icons/tb'
+
+import { BaseOverlayHeader } from '@shared/ui/overlays/base-overlay-header'
 
 import {
     useUsersTableTemplates,
     useUsersTableTemplatesActions
 } from '@entities/dashboard/users/users-table-templates-store'
-import { BaseOverlayHeader } from '@shared/ui/overlays/base-overlay-header'
 
+import { IProps } from './interfaces'
+import { getSwatchColor } from './lib/constants'
 import { applySnapshot, captureSnapshot } from './lib/snapshot'
 import { SaveTemplateModal } from './ui/save-template.modal'
-import { getSwatchColor } from './lib/constants'
-import { IProps } from './interfaces'
 
 export const UsersTableTemplatesFeature = (props: IProps) => {
     const { table } = props
@@ -42,7 +43,7 @@ export const UsersTableTemplatesFeature = (props: IProps) => {
                             onClick={() => applySnapshot(table, template.snapshot)}
                             rightSection={
                                 <ActionIcon
-                                    aria-label={t('common.delete')}
+                                    aria-label={t('common.action.delete')}
                                     color="red"
                                     component="div"
                                     onClick={(event) => {
@@ -82,7 +83,7 @@ export const UsersTableTemplatesFeature = (props: IProps) => {
                         })
                     }}
                 >
-                    {t('common.save')}
+                    {t('common.action.save')}
                 </Menu.Item>
             </Menu.Dropdown>
         </Menu>

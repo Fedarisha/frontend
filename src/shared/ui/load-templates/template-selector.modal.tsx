@@ -1,7 +1,7 @@
 import { Button, Center, Group, LoadingOverlay, Stack, Text } from '@mantine/core'
-import { useTranslation } from 'react-i18next'
 import { useFetch } from '@mantine/hooks'
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 
 import {
     IDownloadableSubscriptionTemplate,
@@ -68,7 +68,7 @@ export const TemplateDownloadModal = (props: TemplateSelectorModalProps) => {
                     <Text>Error loading templates from Github. Try again later.</Text>
                     <Group justify="center" mt="md">
                         <Button onClick={onCancel} variant="subtle">
-                            {t('common.cancel')}
+                            {t('common.action.cancel')}
                         </Button>
                     </Group>
                 </Stack>
@@ -87,7 +87,7 @@ export const TemplateDownloadModal = (props: TemplateSelectorModalProps) => {
             />
             <Group justify="flex-end" mt="md">
                 <Button onClick={onCancel} variant="subtle">
-                    {t('common.cancel')}
+                    {t('common.action.cancel')}
                 </Button>
                 <Button
                     disabled={!selectedTemplate}

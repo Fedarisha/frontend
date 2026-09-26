@@ -1,15 +1,14 @@
+import { TemplatesHeaderActionButtonsFeature } from '@features/ui/dashboard/templates/header-action-buttons'
 import {
     GetSubscriptionTemplatesCommand,
     TSubscriptionTemplateType
 } from '@remnawave/backend-contract'
-import { motion } from 'motion/react'
-
-import { TemplatesHeaderActionButtonsFeature } from '@features/ui/dashboard/templates/header-action-buttons'
 import { TemplatesGridWidget } from '@widgets/dashboard/templates/templates-grid/templates-grid.widget'
 import { TemplatesSpotlightWidget } from '@widgets/dashboard/templates/templates-spotlight'
-import { RenameModalShared } from '@shared/ui/modals/rename-modal.shared'
-import { getCoreLogoFromType } from '@shared/ui/get-core-logo-from-type'
+import { motion } from 'motion/react'
+
 import { Page, PageHeaderShared } from '@shared/ui'
+import { getCoreLogoFromType } from '@shared/ui/get-core-logo-from-type'
 
 interface Props {
     templates: GetSubscriptionTemplatesCommand.Response['response']['templates']
@@ -33,12 +32,10 @@ export const TemplateBasePageComponent = (props: Props) => {
                 initial={{ opacity: 0 }}
                 transition={{ duration: 0.5 }}
             >
-                <TemplatesGridWidget templates={templates} templateTitle={title} type={type} />
+                <TemplatesGridWidget templates={templates} type={type} />
             </motion.div>
 
             <TemplatesSpotlightWidget templates={templates} />
-
-            <RenameModalShared key="rename-template-modal" renameFrom="template" />
         </Page>
     )
 }

@@ -1,14 +1,14 @@
-import { GetAllNodesCommand } from '@remnawave/backend-contract'
 import { Center, Stack, Text, ThemeIcon } from '@mantine/core'
+import { GetNodesCommand } from '@remnawave/backend-contract'
 import { useTranslation } from 'react-i18next'
-import { TbServer } from 'react-icons/tb'
 import { PiCpu } from 'react-icons/pi'
+import { TbServer } from 'react-icons/tb'
 
 import { BaseOverlayHeader } from '@shared/ui/overlays/base-overlay-header'
 import { SectionCard } from '@shared/ui/section-card'
 
 interface IProps {
-    nodes: GetAllNodesCommand.Response['response']
+    nodes: GetNodesCommand.Response['response']
 }
 
 export const ActivePluginsOnNodesModalShared = (props: IProps) => {
@@ -23,7 +23,7 @@ export const ActivePluginsOnNodesModalShared = (props: IProps) => {
                         <PiCpu size={24} />
                     </ThemeIcon>
                     <Text c="dimmed" size="sm" ta="center">
-                        {t('adtive-on-nodes.modal.shared.this-plugin-is-not-active-on-any-nodes')}
+                        {t('active-on-nodes.modal.shared.this-plugin-is-not-active-on-any-nodes')}
                     </Text>
                 </Stack>
             </Center>

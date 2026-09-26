@@ -1,9 +1,9 @@
 import { Anchor, Checkbox, Code, Input, NumberInput, Stack, Text, Textarea } from '@mantine/core'
-import { BulkUpdateUsersCommand, GetAllTagsCommand } from '@remnawave/backend-contract'
-import { ForwardRefComponent, HTMLMotionProps, Variants } from 'motion/react'
-import { TbDevices2, TbSettings } from 'react-icons/tb'
-import { Trans, useTranslation } from 'react-i18next'
 import { UseFormReturnType } from '@mantine/form'
+import { BulkUpdateUsersCommand, GetUsersTagsCommand } from '@remnawave/backend-contract'
+import { ForwardRefComponent, HTMLMotionProps, Variants } from 'motion/react'
+import { Trans, useTranslation } from 'react-i18next'
+import { TbDevices2, TbSettings } from 'react-icons/tb'
 
 import { CreateableTagInputShared } from '@shared/ui/createable-tag-input/createable-tag-input'
 import { BaseOverlayHeader } from '@shared/ui/overlays/base-overlay-header'
@@ -11,9 +11,9 @@ import { SectionCard } from '@shared/ui/section-card'
 
 interface IProps {
     cardVariants: Variants
-    form: UseFormReturnType<BulkUpdateUsersCommand.Request>
+    form: UseFormReturnType<BulkUpdateUsersCommand.RequestBody>
     motionWrapper: ForwardRefComponent<HTMLDivElement, HTMLMotionProps<'div'>>
-    tags: GetAllTagsCommand.Response['response'] | undefined
+    tags: GetUsersTagsCommand.Response['response'] | undefined
 }
 
 export function BulkDeviceTagSettingsCard(props: IProps) {
@@ -98,7 +98,7 @@ export function BulkDeviceTagSettingsCard(props: IProps) {
                         <Textarea
                             description={t('create-user-modal.widget.user-description')}
                             key={form.key('fields.description')}
-                            label={t('use-table-columns.description')}
+                            label={t('common.field.description')}
                             resize="vertical"
                             {...form.getInputProps('fields.description')}
                             styles={{

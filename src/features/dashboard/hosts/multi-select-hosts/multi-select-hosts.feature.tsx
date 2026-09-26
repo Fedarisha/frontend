@@ -1,14 +1,4 @@
 import {
-    TbArrowBarToDown,
-    TbArrowBarToUp,
-    TbArrowBigDown,
-    TbArrowBigUp,
-    TbCategoryPlus,
-    TbCopy,
-    TbSelectAll,
-    TbTrash
-} from 'react-icons/tb'
-import {
     ActionIcon,
     Affix,
     Badge,
@@ -20,35 +10,53 @@ import {
     Tooltip,
     Transition
 } from '@mantine/core'
-import { PiProhibitDuotone, PiPulseDuotone } from 'react-icons/pi'
-import { notifications } from '@mantine/notifications'
-import { useTranslation } from 'react-i18next'
 import { modals } from '@mantine/modals'
+import { notifications } from '@mantine/notifications'
 import { useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
+import { PiProhibitDuotone, PiPulseDuotone } from 'react-icons/pi'
+import {
+    TbArrowBarToDown,
+    TbArrowBarToUp,
+    TbArrowBigDown,
+    TbArrowBigUp,
+    TbCategoryPlus,
+    TbCopy,
+    TbSelectAll,
+    TbTrash
+} from 'react-icons/tb'
 
+import { showModal } from '@shared/_modals/show-modal'
+import { useBulkEnableHosts, useCloneHost, useGetHosts } from '@shared/api/hooks'
 import {
     useBulkDeleteHosts,
     useBulkDisableHosts
 } from '@shared/api/hooks/hosts/hosts.mutation.hooks'
-import { MODALS, useModalsStoreOpenWithData } from '@entities/dashboard/modal-store'
-import { useBulkEnableHosts, useCreateHost, useGetHosts } from '@shared/api/hooks'
-import { cloneString } from '@shared/utils/misc/clone-string'
+
+import { useHostsActiveTag } from '@entities/dashboard/view-preferences-store'
 
 import { IProps } from './interfaces/props.interface'
 
 export const MultiSelectHostsFeature = (props: IProps) => {
     const { configProfiles, hosts, moveSelected, selectedHosts, setSelectedHosts } = props
 
-    const openModalWithData = useModalsStoreOpenWithData()
-
     const { t } = useTranslation()
 
     const hasSelection = selectedHosts.length > 0
 
     const { refetch: refetchHosts } = useGetHosts()
+    const activeTag = useHostsActiveTag()
 
     useEffect(() => {
-        setSelectedHosts([])
+        if (!hosts) return
+
+        const existingUuids = new Set(hosts.map((host) => host.uuid))
+
+        setSelectedHosts((current) => {
+            const alive = current.filter((uuid) => existingUuids.has(uuid))
+
+            return alive.length === current.length ? current : alive
+        })
     }, [hosts])
 
     const { mutate: bulkDeleteHosts } = useBulkDeleteHosts({
@@ -72,7 +80,7 @@ export const MultiSelectHostsFeature = (props: IProps) => {
             }
         }
     })
-    const { mutateAsync: createHost } = useCreateHost()
+    const { mutateAsync: cloneHost } = useCloneHost()
 
     const selectAllHosts = () => {
         setSelectedHosts(hosts?.map((host) => host.uuid) || [])
@@ -84,15 +92,19 @@ export const MultiSelectHostsFeature = (props: IProps) => {
 
     const deleteSelectedHosts = () => {
         modals.openConfirmModal({
-            title: t('common.delete'),
+            title: t('common.action.confirm-action'),
             centered: true,
-            children: t('common.confirm-action-description'),
+            children: t('common.message.confirm-action-description'),
             labels: {
-                confirm: t('common.delete'),
-                cancel: t('common.cancel')
+                confirm: t('common.action.delete'),
+                cancel: t('common.action.cancel')
             },
             confirmProps: {
-                color: 'red'
+                color: 'red',
+                variant: 'soft'
+            },
+            cancelProps: {
+                variant: 'subtle'
             },
             onConfirm: () => {
                 bulkDeleteHosts({ variables: { uuids: selectedHosts } })
@@ -120,7 +132,7 @@ export const MultiSelectHostsFeature = (props: IProps) => {
 
         if (cloneableHosts.length === 0) {
             notifications.show({
-                title: t('edit-host-modal.widget.error'),
+                title: t('common.message.error'),
                 message: t('edit-host-modal.widget.dangling-host-cannot-be-cloned'),
                 color: 'red'
             })
@@ -129,12 +141,12 @@ export const MultiSelectHostsFeature = (props: IProps) => {
         }
 
         modals.openConfirmModal({
-            title: t('common.confirm-action'),
+            title: t('common.action.confirm-action'),
             centered: true,
-            children: t('common.confirm-action-description'),
+            children: t('common.message.confirm-action-description'),
             labels: {
-                confirm: t('common.clone'),
-                cancel: t('common.cancel')
+                confirm: t('common.action.clone'),
+                cancel: t('common.action.cancel')
             },
             confirmProps: {
                 color: 'cyan',
@@ -143,7 +155,7 @@ export const MultiSelectHostsFeature = (props: IProps) => {
             onConfirm: async () => {
                 if (danglingCount > 0) {
                     notifications.show({
-                        title: t('edit-host-modal.widget.error'),
+                        title: t('common.message.error'),
                         message: t('multi-select-hosts.feature.dangling-hosts-skipped', {
                             count: danglingCount
                         }),
@@ -151,21 +163,9 @@ export const MultiSelectHostsFeature = (props: IProps) => {
                     })
                 }
 
-                await Promise.allSettled(
-                    cloneableHosts.map((host) =>
-                        createHost({
-                            variables: {
-                                ...host,
-                                remark: cloneString(host.remark),
-                                isDisabled: true,
-                                inbound: {
-                                    configProfileUuid: host.inbound.configProfileUuid!,
-                                    configProfileInboundUuid: host.inbound.configProfileInboundUuid!
-                                }
-                            }
-                        })
-                    )
-                )
+                for (const host of cloneableHosts) {
+                    await cloneHost({ variables: { cloneFromUuid: host.uuid } })
+                }
 
                 refetchHosts()
                 clearSelection()
@@ -202,14 +202,12 @@ export const MultiSelectHostsFeature = (props: IProps) => {
                             <Stack>
                                 <Group justify="space-between">
                                     <Badge color="shaded-gray" size="lg" variant="soft">
-                                        {t('internal-squads.drawer.widget.selected')}:{' '}
-                                        {selectedHosts.length}
+                                        {t('common.message.selected', {
+                                            count: selectedHosts.length
+                                        })}
                                     </Badge>
                                     <Group gap={0} justify="flex-end">
-                                        <Tooltip
-                                            label={t('multi-select-hosts.feature.select-all')}
-                                            withArrow
-                                        >
+                                        <Tooltip label={t('common.action.select-all')} withArrow>
                                             <ActionIcon
                                                 color="gray"
                                                 onClick={selectAllHosts}
@@ -220,7 +218,7 @@ export const MultiSelectHostsFeature = (props: IProps) => {
                                             </ActionIcon>
                                         </Tooltip>
                                         <Tooltip
-                                            label={t('multi-select-hosts.feature.clear-selection')}
+                                            label={t('common.action.clear-selection')}
                                             withArrow
                                         >
                                             <CloseButton onClick={clearSelection} />
@@ -228,55 +226,57 @@ export const MultiSelectHostsFeature = (props: IProps) => {
                                     </Group>
                                 </Group>
 
-                                <ActionIcon.Group style={{ width: '100%' }}>
-                                    <Tooltip label="Move to top" withArrow>
-                                        <ActionIcon
-                                            color="gray"
-                                            onClick={() => moveSelected('top')}
-                                            size="lg"
-                                            style={{ flex: 1 }}
-                                            variant="soft"
-                                        >
-                                            <TbArrowBarToUp size={20} />
-                                        </ActionIcon>
-                                    </Tooltip>
+                                {activeTag === null && (
+                                    <ActionIcon.Group style={{ width: '100%' }}>
+                                        <Tooltip label="Move to top" withArrow>
+                                            <ActionIcon
+                                                color="gray"
+                                                onClick={() => moveSelected('top')}
+                                                size="lg"
+                                                style={{ flex: 1 }}
+                                                variant="soft"
+                                            >
+                                                <TbArrowBarToUp size={20} />
+                                            </ActionIcon>
+                                        </Tooltip>
 
-                                    <Tooltip label="Move up" withArrow>
-                                        <ActionIcon
-                                            color="gray"
-                                            onClick={() => moveSelected('up')}
-                                            size="lg"
-                                            style={{ flex: 1 }}
-                                            variant="soft"
-                                        >
-                                            <TbArrowBigUp size={20} />
-                                        </ActionIcon>
-                                    </Tooltip>
+                                        <Tooltip label="Move up" withArrow>
+                                            <ActionIcon
+                                                color="gray"
+                                                onClick={() => moveSelected('up')}
+                                                size="lg"
+                                                style={{ flex: 1 }}
+                                                variant="soft"
+                                            >
+                                                <TbArrowBigUp size={20} />
+                                            </ActionIcon>
+                                        </Tooltip>
 
-                                    <Tooltip label="Move down" withArrow>
-                                        <ActionIcon
-                                            color="gray"
-                                            onClick={() => moveSelected('down')}
-                                            size="lg"
-                                            style={{ flex: 1 }}
-                                            variant="soft"
-                                        >
-                                            <TbArrowBigDown size={20} />
-                                        </ActionIcon>
-                                    </Tooltip>
+                                        <Tooltip label="Move down" withArrow>
+                                            <ActionIcon
+                                                color="gray"
+                                                onClick={() => moveSelected('down')}
+                                                size="lg"
+                                                style={{ flex: 1 }}
+                                                variant="soft"
+                                            >
+                                                <TbArrowBigDown size={20} />
+                                            </ActionIcon>
+                                        </Tooltip>
 
-                                    <Tooltip label="Move to bottom" withArrow>
-                                        <ActionIcon
-                                            color="gray"
-                                            onClick={() => moveSelected('bottom')}
-                                            size="lg"
-                                            style={{ flex: 1 }}
-                                            variant="soft"
-                                        >
-                                            <TbArrowBarToDown size={20} />
-                                        </ActionIcon>
-                                    </Tooltip>
-                                </ActionIcon.Group>
+                                        <Tooltip label="Move to bottom" withArrow>
+                                            <ActionIcon
+                                                color="gray"
+                                                onClick={() => moveSelected('bottom')}
+                                                size="lg"
+                                                style={{ flex: 1 }}
+                                                variant="soft"
+                                            >
+                                                <TbArrowBarToDown size={20} />
+                                            </ActionIcon>
+                                        </Tooltip>
+                                    </ActionIcon.Group>
+                                )}
 
                                 <Group grow justify="apart" preventGrowOverflow={false} wrap="wrap">
                                     <Button
@@ -285,7 +285,7 @@ export const MultiSelectHostsFeature = (props: IProps) => {
                                         onClick={enableSelectedHosts}
                                         variant="soft"
                                     >
-                                        {t('common.enable')}
+                                        {t('common.action.enable')}
                                     </Button>
                                     <Button
                                         color="gray"
@@ -293,7 +293,7 @@ export const MultiSelectHostsFeature = (props: IProps) => {
                                         onClick={disableSelectedHosts}
                                         variant="soft"
                                     >
-                                        {t('common.disable')}
+                                        {t('common.action.disable')}
                                     </Button>
                                 </Group>
                                 <Stack>
@@ -302,13 +302,13 @@ export const MultiSelectHostsFeature = (props: IProps) => {
                                         fullWidth
                                         leftSection={<TbCategoryPlus size={18} />}
                                         onClick={() =>
-                                            openModalWithData(MODALS.EDIT_MANY_HOSTS_DRAWER, {
+                                            showModal('hosts_editManyHostsDrawer', {
                                                 uuids: selectedHosts
                                             })
                                         }
                                         variant="soft"
                                     >
-                                        {t('common.update')}
+                                        {t('common.action.update')}
                                     </Button>
 
                                     <Button
@@ -318,7 +318,7 @@ export const MultiSelectHostsFeature = (props: IProps) => {
                                         onClick={cloneSelectedHosts}
                                         variant="soft"
                                     >
-                                        {t('common.clone')}
+                                        {t('common.action.clone')}
                                     </Button>
 
                                     <Button
@@ -328,7 +328,7 @@ export const MultiSelectHostsFeature = (props: IProps) => {
                                         onClick={deleteSelectedHosts}
                                         variant="soft"
                                     >
-                                        {t('common.delete')}
+                                        {t('common.action.delete')}
                                     </Button>
                                 </Stack>
                             </Stack>

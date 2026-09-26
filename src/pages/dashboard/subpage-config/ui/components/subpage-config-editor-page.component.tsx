@@ -1,15 +1,4 @@
 import {
-    TbArrowBackUp,
-    TbCheck,
-    TbCloudDownload,
-    TbDeviceFloppy,
-    TbDownload,
-    TbFile,
-    TbFileImport,
-    TbPalette,
-    TbUpload
-} from 'react-icons/tb'
-import {
     ActionIcon,
     Button,
     CopyButton,
@@ -20,20 +9,14 @@ import {
     ThemeIcon,
     Tooltip
 } from '@mantine/core'
+import { useForm, schemaResolver } from '@mantine/form'
+import { modals } from '@mantine/modals'
+import { notifications } from '@mantine/notifications'
+import { GetSubpageConfigCommand } from '@remnawave/backend-contract'
 import {
     SubscriptionPageRawConfigSchema,
     TSubscriptionPageRawConfig
 } from '@remnawave/subscription-page-types'
-import { GetSubscriptionPageConfigCommand } from '@remnawave/backend-contract'
-import { zodResolver } from 'mantine-form-zod-resolver'
-import { notifications } from '@mantine/notifications'
-import { PiCheck, PiCopy } from 'react-icons/pi'
-import { useNavigate } from 'react-router'
-import { useTranslation } from 'react-i18next'
-import { modals } from '@mantine/modals'
-import { useForm } from '@mantine/form'
-import { useRef } from 'react'
-
 import {
     BaseSettingsBlockComponent,
     BaseTranslationsBlockComponent,
@@ -49,18 +32,34 @@ import {
     showSubpageConfigSavedModal,
     showValidationErrorsModal
 } from '@widgets/dashboard/subpage-configs/subpage-config-editor/modals'
-import { useDownloadTemplate } from '@shared/ui/load-templates/use-download-template'
-import { QueryKeys, useUpdateSubscriptionPageConfig } from '@shared/api/hooks'
-import { BaseOverlayHeader } from '@shared/ui/overlays/base-overlay-header'
+import { useRef } from 'react'
+import { useTranslation } from 'react-i18next'
+import { PiCheck, PiCopy } from 'react-icons/pi'
+import {
+    TbArrowBackUp,
+    TbCheck,
+    TbCloudDownload,
+    TbDeviceFloppy,
+    TbDownload,
+    TbFile,
+    TbFileImport,
+    TbPalette,
+    TbUpload
+} from 'react-icons/tb'
+import { useNavigate } from 'react-router'
+
+import { QueryKeys, useUpdateSubpageConfig } from '@shared/api/hooks'
 import { queryClient } from '@shared/api/query-client'
-import { Page, PageHeaderShared } from '@shared/ui'
-import { ROUTES } from '@shared/constants'
+import { OPEN_ENTITY, ROUTES } from '@shared/constants'
+import { CopyEntityLinkButton, Page, PageHeaderShared } from '@shared/ui'
+import { useDownloadTemplate } from '@shared/ui/load-templates/use-download-template'
+import { BaseOverlayHeader } from '@shared/ui/overlays/base-overlay-header'
 import { sleep } from '@shared/utils/misc'
 
 import styles from './subpage-config-editor-page.module.css'
 
 interface Props {
-    config: GetSubscriptionPageConfigCommand.Response['response']
+    config: GetSubpageConfigCommand.Response['response']
 }
 
 export const SubpageConfigEditorPageComponent = (props: Props) => {
@@ -72,15 +71,15 @@ export const SubpageConfigEditorPageComponent = (props: Props) => {
     const form = useForm<TSubscriptionPageRawConfig>({
         mode: 'uncontrolled',
         initialValues: config.config as TSubscriptionPageRawConfig,
-        validate: zodResolver(SubscriptionPageRawConfigSchema)
+        validate: schemaResolver(SubscriptionPageRawConfigSchema)
     })
 
     const { mutate: updateSubscriptionPageConfig, isPending: isUpdatingSubscriptionPageConfig } =
-        useUpdateSubscriptionPageConfig({
+        useUpdateSubpageConfig({
             mutationFns: {
                 onSuccess: (data) => {
                     queryClient.setQueryData(
-                        QueryKeys.subpageConfigs.getSubscriptionPageConfig({
+                        QueryKeys.subpageConfigs.getSubpageConfig({
                             uuid: config.uuid
                         }).queryKey,
                         data
@@ -178,7 +177,7 @@ export const SubpageConfigEditorPageComponent = (props: Props) => {
         notifications.update({
             id: 'import-config',
             loading: false,
-            title: t('subpage-config-editor-page.component.success'),
+            title: t('common.message.success'),
             message: t('subpage-config-editor-page.component.config-imported-successfully'),
             icon: <TbCheck size={18} />,
             autoClose: 3000,
@@ -195,7 +194,7 @@ export const SubpageConfigEditorPageComponent = (props: Props) => {
             const validatedConfig = SubscriptionPageRawConfigSchema.safeParse(configData)
 
             if (!validatedConfig.success) {
-                const errors = validatedConfig.error.errors.map((err) => ({
+                const errors = validatedConfig.error.issues.map((err) => ({
                     path: err.path.join('.'),
                     message: err.message
                 }))
@@ -228,7 +227,7 @@ export const SubpageConfigEditorPageComponent = (props: Props) => {
             })
         } catch {
             notifications.show({
-                title: t('subpage-config-editor-page.component.error'),
+                title: t('common.message.error'),
                 message: t('subpage-config-editor-page.component.failed-to-parse-config-file'),
                 color: 'red'
             })
@@ -250,6 +249,14 @@ export const SubpageConfigEditorPageComponent = (props: Props) => {
             <PageHeaderShared
                 actions={
                     <Group>
+                        <CopyEntityLinkButton
+                            entity={OPEN_ENTITY.SUBPAGE_CONFIG}
+                            iconSize={24}
+                            id={config.uuid}
+                            size="input-md"
+                            variant="soft"
+                        />
+
                         {/* <HelpActionIconShared
                             hidden={!isHelpDrawerVisible}
                             screen="EDITOR_TEMPLATES_XRAY_JSON"
@@ -289,7 +296,7 @@ export const SubpageConfigEditorPageComponent = (props: Props) => {
 
                         <CopyButton timeout={2000} value={config.uuid}>
                             {({ copied, copy }) => (
-                                <Tooltip label={t('common.copy-uuid')}>
+                                <Tooltip label={t('common.action.copy-uuid')}>
                                     <ActionIcon
                                         color={copied ? 'teal' : 'gray'}
                                         onClick={copy}
@@ -327,7 +334,7 @@ export const SubpageConfigEditorPageComponent = (props: Props) => {
                             size="md"
                             variant="light"
                         >
-                            {t('subpage-config-visual-editor.widget.load-from-github')}
+                            {t('common.action.load-from-github')}
                         </Button>
 
                         <Button
@@ -337,9 +344,9 @@ export const SubpageConfigEditorPageComponent = (props: Props) => {
                             loading={isUpdatingSubscriptionPageConfig}
                             onClick={handleSave}
                             size="md"
-                            variant="light"
+                            variant="soft"
                         >
-                            {t('common.save')}
+                            {t('common.action.save')}
                         </Button>
                     </Group>
                 }

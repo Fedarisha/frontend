@@ -1,20 +1,15 @@
+import type { AggregatedUser, AggregatedUserNode } from './use-sessions-explorer'
+
 import { ActionIcon, Badge, Box, Group, Tooltip } from '@mantine/core'
-import { TbFingerprint, TbId, TbServer, TbSum } from 'react-icons/tb'
-import { createSearchParams, useNavigate } from 'react-router'
 import { forwardRef, memo, useMemo } from 'react'
-import { GroupedVirtuoso } from 'react-virtuoso'
 import { useTranslation } from 'react-i18next'
 import { PiUserCircle } from 'react-icons/pi'
+import { TbFingerprint, TbId, TbServer, TbSum } from 'react-icons/tb'
+import { GroupedVirtuoso } from 'react-virtuoso'
 
-import { useUserModalStoreActions } from '@entities/dashboard/user-modal-store'
+import { showModal } from '@shared/_modals/show-modal'
 import { BaseOverlayHeader } from '@shared/ui/overlays/base-overlay-header'
-import { SEARCH_PARAMS } from '@shared/constants/search-params'
-import { isPwa } from '@shared/utils/open-or-navigate'
 import { SectionCard } from '@shared/ui/section-card'
-import { useResolveUser } from '@shared/api/hooks'
-import { ROUTES } from '@shared/constants'
-
-import type { AggregatedUser, AggregatedUserNode } from './use-sessions-explorer'
 
 import { SessionsExplorerIpRow } from './sessions-explorer-ip-row'
 import styles from './sessions-explorer.module.css'
@@ -62,10 +57,6 @@ const virtuosoComponents = {
 export const SessionsExplorerCard = memo(
     ({ user, midThreshold, highThreshold, ipSearchQuery }: IProps) => {
         const { t } = useTranslation()
-        const { mutateAsync: resolveUser, isPending: isLoading } = useResolveUser()
-        const navigate = useNavigate()
-
-        const userModalActions = useUserModalStoreActions()
 
         const { visibleNodes, groupCounts, flatIps } = useMemo(() => {
             const visible: AggregatedUserNode[] = []
@@ -82,23 +73,7 @@ export const SessionsExplorerCard = memo(
         }, [user.nodes])
 
         const handleViewUser = async () => {
-            const result = await resolveUser({
-                variables: {
-                    id: Number(user.userId)
-                }
-            })
-
-            if (result.uuid) {
-                if (isPwa()) {
-                    const searchParams = createSearchParams({
-                        [SEARCH_PARAMS.USER]: String(result.uuid)
-                    })
-
-                    navigate(`${ROUTES.DASHBOARD.MANAGEMENT.USERS}?${searchParams.toString()}`)
-                }
-                await userModalActions.setUserUuid(result.uuid)
-                userModalActions.changeModalState(true)
-            }
+            showModal('users_viewUserModal', { userId: user.userId })
         }
 
         return (
@@ -111,7 +86,6 @@ export const SessionsExplorerCard = memo(
                                 <Tooltip label={t('node-active-session.item.widget.view-user')}>
                                     <ActionIcon
                                         color="cyan"
-                                        loading={isLoading}
                                         onClick={handleViewUser}
                                         size="lg"
                                         variant="soft"
@@ -122,7 +96,7 @@ export const SessionsExplorerCard = memo(
                             }
                             IconComponent={TbId}
                             iconVariant="soft"
-                            title={user.userId}
+                            title={user.userId.toString()}
                             titleOrder={5}
                             truncateTitle
                         />

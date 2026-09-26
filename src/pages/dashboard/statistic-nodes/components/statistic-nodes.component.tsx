@@ -1,18 +1,18 @@
 import { ActionIcon, Select, SimpleGrid, Stack } from '@mantine/core'
-import { TbCalendar, TbRefresh, TbServer2 } from 'react-icons/tb'
 import { DatePickerInput, DatesRangeValue } from '@mantine/dates'
+import { NodesStatisticBarchartWidget } from '@widgets/dashboard/nodes-statistic/statistic-barchart'
+import { NodesStatisticSparklineCardWidget } from '@widgets/dashboard/nodes-statistic/statistic-sparkline-card'
+import dayjs from 'dayjs'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { HiChartPie } from 'react-icons/hi'
-import { useState } from 'react'
-import dayjs from 'dayjs'
+import { TbCalendar, TbRefresh, TbServer2 } from 'react-icons/tb'
 
-import { NodesStatisticSparklineCardWidget } from '@widgets/dashboard/nodes-statistic/statistic-sparkline-card'
-import { NodesStatisticBarchartWidget } from '@widgets/dashboard/nodes-statistic/statistic-barchart'
-import { TopLeaderboardCardShared } from '@shared/ui/leaderboard-item-card'
-import { getDefaultDateRange } from '@shared/utils/time-utils'
-import { CountryFlag } from '@shared/ui/get-country-flag'
 import { useGetStatsNodesUsage } from '@shared/api/hooks'
 import { Page, PageHeaderShared } from '@shared/ui'
+import { CountryFlag } from '@shared/ui/get-country-flag'
+import { TopLeaderboardCardShared } from '@shared/ui/leaderboard-item-card'
+import { getDefaultDateRange } from '@shared/utils/time-utils'
 
 const TOP_NODES_LIMIT_OPTIONS = [
     { value: '5', label: 'Top 5' },
@@ -196,7 +196,7 @@ export const StatisticNodesPage = () => {
                     />
 
                     <TopLeaderboardCardShared
-                        emptyText={t('statistic-nodes.component.no-data-available')}
+                        emptyText={t('common.message.no-data-available')}
                         isLoading={isLoading}
                         items={nodesStats?.topNodes?.map((node) => ({
                             color: node.color,

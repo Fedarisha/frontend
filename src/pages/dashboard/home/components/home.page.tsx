@@ -1,18 +1,20 @@
 import { ActionIcon, Box, Group, SimpleGrid, Stack, Title } from '@mantine/core'
-import { TbCamera, TbInfoCircle } from 'react-icons/tb'
-import { notifications } from '@mantine/notifications'
-import { useTranslation } from 'react-i18next'
-import { useRef, useState } from 'react'
 import { modals } from '@mantine/modals'
+import { notifications } from '@mantine/notifications'
+import { useRef, useState } from 'react'
+import { useTranslation } from 'react-i18next'
+import { TbCamera, TbInfoCircle } from 'react-icons/tb'
 
-import { MetricCardShared, MetricCardWithTrendShared } from '@shared/ui/metrics/metric-card'
-import { copyScreenshotToClipboard } from '@shared/utils/copy-screenshot.util'
-import { BaseOverlayHeader } from '@shared/ui/overlays/base-overlay-header'
-import { DisclaimerOverlay } from '@shared/ui/disclaimer-overlay'
 import { useIsMobile } from '@shared/hooks'
 import { LoadingScreen } from '@shared/ui'
+import { DisclaimerOverlay } from '@shared/ui/disclaimer-overlay'
+import { MetricCardShared, MetricCardWithTrendShared } from '@shared/ui/metrics/metric-card'
+import { BaseOverlayHeader } from '@shared/ui/overlays/base-overlay-header'
 import { Page } from '@shared/ui/page'
+import { copyScreenshotToClipboard } from '@shared/utils/copy-screenshot.util'
 
+import classes from './home.module.css'
+import { IProps } from './interfaces'
 import {
     getBandwidthMetrics,
     getOnlineMetrics,
@@ -21,10 +23,8 @@ import {
     getSimpleMetrics,
     getUsersMetrics
 } from './metrics'
-import { RuntimeInfoModalContent } from './runtime-info-modal/runtime-info-modal'
 import { RuntimeDetailCard } from './runtime-detail-card'
-import classes from './home.module.css'
-import { IProps } from './interfaces'
+import { RuntimeInfoModalContent } from './runtime-info-modal/runtime-info-modal'
 
 interface IAnimatedCardProps {
     children: React.ReactNode
@@ -50,10 +50,13 @@ export const HomePage = (props: IProps) => {
         if (!runtimeRef.current || copying) return
         setCopying(true)
         try {
-            await new Promise<void>((resolve) => {
-                setTimeout(resolve, 100)
-            })
-            await copyScreenshotToClipboard(runtimeRef.current)
+            await copyScreenshotToClipboard(async () => {
+                await new Promise<void>((resolve) => {
+                    setTimeout(resolve, 100)
+                })
+                if (!runtimeRef.current) throw new Error('runtimeRef')
+                return runtimeRef.current
+            }, 'remnawave-runtime.png')
         } catch (error) {
             notifications.show({
                 color: 'red',
@@ -145,7 +148,7 @@ export const HomePage = (props: IProps) => {
 
                 <div className={classes.section}>
                     <Title className={classes.title} m="xs" ml={0} order={4}>
-                        {t('home.page.system')}
+                        {t('common.field.system')}
                     </Title>
                     <SimpleGrid cols={{ base: 1, sm: 2, xl: 4 }} spacing="xs">
                         {simpleMetrics.map((metric, index) => (

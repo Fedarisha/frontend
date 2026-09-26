@@ -1,10 +1,10 @@
+import react from '@vitejs/plugin-react'
+import { defineConfig } from 'vite'
 // import { splashScreen } from 'vite-plugin-splash-screen'
 // import { visualizer } from 'rollup-plugin-visualizer'
 // import deadFile from 'vite-plugin-deadfile'
 import removeConsole from 'vite-plugin-remove-console'
 import webfontDownload from 'vite-plugin-webfont-dl'
-import react from '@vitejs/plugin-react'
-import { defineConfig } from 'vite'
 import 'dotenv/config'
 
 export default defineConfig({
@@ -28,7 +28,13 @@ export default defineConfig({
         // })
     ],
     optimizeDeps: {
-        include: ['html-parse-stringify']
+        include: [
+            'html-parse-stringify',
+            'monaco-editor/editor',
+            'monaco-editor/features/register.all',
+            'monaco-editor/languages/definitions/yaml/yaml',
+            'monaco-editor/languages/features/json/register'
+        ]
     },
     build: {
         target: 'esnext',
@@ -88,7 +94,7 @@ export default defineConfig({
                         },
                         {
                             name: 'dnd',
-                            test: /node_modules[\\/]@dnd-kit[\\/](core|sortable|utilities)[\\/]/
+                            test: /node_modules[\\/]@dnd-kit[\\/](abstract|dom|helpers|react)[\\/]/
                         },
                         {
                             name: 'mantinetable',
@@ -105,6 +111,10 @@ export default defineConfig({
                         {
                             name: 'tanstack',
                             test: /node_modules[\\/]@tanstack[\\/](react-query|react-table|react-virtual)[\\/]/
+                        },
+                        {
+                            name: 'xterm',
+                            test: /node_modules[\\/]@xterm[\\/]/
                         }
                     ]
                 }
@@ -126,5 +136,13 @@ export default defineConfig({
             overlay: false
         }
     },
-    resolve: { tsconfigPaths: true }
+    resolve: {
+        tsconfigPaths: true,
+        alias: [
+            {
+                find: /^monaco-editor\/esm\/vs\/(.*)$/,
+                replacement: 'monaco-editor/$1'
+            }
+        ]
+    }
 })

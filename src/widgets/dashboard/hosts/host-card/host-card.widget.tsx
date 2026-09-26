@@ -1,16 +1,32 @@
+import { OptimisticSortingPlugin } from '@dnd-kit/dom/sortable'
+import { useSortable } from '@dnd-kit/react/sortable'
 import {
     ActionIcon,
     Badge,
     Box,
     Checkbox,
     Group,
-    OverflowList,
     px,
     Stack,
     Text,
     ThemeIcon,
     Tooltip
 } from '@mantine/core'
+import { modals } from '@mantine/modals'
+import {
+    GetHostsCommand,
+    GetNodesCommand,
+    GetConfigProfilesCommand,
+    INTERNAL_SQUADS_MODE,
+    SUBSCRIPTION_TEMPLATE_TYPE
+} from '@remnawave/backend-contract'
+import cx from 'clsx'
+import ColorHash from 'color-hash'
+import { githubDarkTheme, JsonEditor } from 'json-edit-react'
+import { CSSProperties, useState } from 'react'
+import { useTranslation } from 'react-i18next'
+import { PiNetwork, PiProhibit, PiPulse } from 'react-icons/pi'
+import { RiDraggable } from 'react-icons/ri'
 import {
     TbAlertCircle,
     TbCirclesRelation,
@@ -20,40 +36,28 @@ import {
     TbMask,
     TbStar
 } from 'react-icons/tb'
-import {
-    GetAllHostsCommand,
-    GetAllNodesCommand,
-    GetConfigProfilesCommand
-} from '@remnawave/backend-contract'
-import { createSearchParams, useNavigate } from 'react-router'
-import { PiNetwork, PiProhibit, PiPulse } from 'react-icons/pi'
-import { CSSProperties, useState } from 'react'
-import { useSortable } from '@dnd-kit/sortable'
-import { useTranslation } from 'react-i18next'
-import { RiDraggable } from 'react-icons/ri'
-import { CSS } from '@dnd-kit/utilities'
-import ColorHash from 'color-hash'
-import cx from 'clsx'
+import { generatePath } from 'react-router'
 
-import { MODALS, useModalsStoreOpenWithData } from '@entities/dashboard/modal-store'
-import { resolveCountryCode } from '@shared/utils/misc/resolve-country-code'
-import { SEARCH_PARAMS } from '@shared/constants/search-params'
-import { openOrNavigate } from '@shared/utils/open-or-navigate'
-import { XrayLogo } from '@shared/ui/logos'
-import { useIsMobile } from '@shared/hooks'
+import { showModal } from '@shared/_modals/show-modal'
 import { ROUTES } from '@shared/constants'
+import { useIsMobile } from '@shared/hooks'
+import { XrayLogo } from '@shared/ui/logos'
+import { BaseOverlayHeader } from '@shared/ui/overlays/base-overlay-header'
+import { SingleRowOverflowList } from '@shared/ui/single-row-overflow-list'
+import { resolveCountryCode } from '@shared/utils/misc/resolve-country-code'
 
 import classes from './HostCard.module.css'
 
 export interface IProps {
     configProfiles: GetConfigProfilesCommand.Response['response']['configProfiles'] | undefined
+    index?: number
     isDragOverlay?: boolean
     isSelected?: boolean
-    item: GetAllHostsCommand.Response['response'][number]
-    nodesByUuid: Map<string, GetAllNodesCommand.Response['response'][number]>
+    item: GetHostsCommand.Response['response'][number]
+    nodesByUuid: Map<string, GetNodesCommand.Response['response'][number]>
     onSelect?: () => void
-    openExternal?: boolean
     viewOnly?: boolean
+    disableReordering?: boolean
 }
 
 export function HostCardWidget(props: IProps) {
@@ -61,17 +65,16 @@ export function HostCardWidget(props: IProps) {
         nodesByUuid,
         item,
         configProfiles,
+        index = 0,
         isSelected,
         onSelect,
         isDragOverlay = false,
         viewOnly = false,
-        openExternal = false
+
+        disableReordering = false
     } = props
 
     const { t } = useTranslation()
-    const navigate = useNavigate()
-
-    const openModalWithData = useModalsStoreOpenWithData()
 
     const [isHovered, setIsHovered] = useState(false)
     const isMobile = useIsMobile()
@@ -84,32 +87,26 @@ export function HostCardWidget(props: IProps) {
         (inbound) => inbound.uuid === item.inbound.configProfileInboundUuid
     )?.tag
 
-    const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    const sortable = useSortable({
         id: item.uuid,
-        disabled: isDragOverlay
+        index,
+        disabled: isDragOverlay || disableReordering || viewOnly,
+        plugins: (defaults) => defaults.filter((plugin) => plugin !== OptimisticSortingPlugin)
     })
 
+    const isDragging = !isDragOverlay && sortable.isDragging
+    const { ref, handleRef } = sortable
+
     const style: CSSProperties = {
-        transform: CSS.Transform.toString(transform),
-        transition,
         opacity: isDragging ? 0 : 1,
         zIndex: isDragging ? 1000 : 'auto',
         position: 'relative'
     }
 
     const handleEdit = () => {
-        if (openExternal) {
-            openOrNavigate(
-                `${ROUTES.DASHBOARD.MANAGEMENT.HOSTS}?${createSearchParams({
-                    [SEARCH_PARAMS.HOST]: item.uuid
-                })}`,
-                navigate
-            )
-
-            return
-        }
-
-        openModalWithData(MODALS.EDIT_HOST_MODAL, item)
+        showModal('hosts_editHostDrawer', {
+            hostUuid: item.uuid
+        })
     }
 
     if (!configProfiles) {
@@ -133,7 +130,8 @@ export function HostCardWidget(props: IProps) {
     const hasSockoptParams = isParamSet(item.sockoptParams)
     const hasXrayJsonTemplate = !!item.xrayJsonTemplateUuid
     const serverDescription = item.serverDescription?.trim() || ''
-    const hasExcludedSquads = item.excludedInternalSquads.length > 0
+    const hasInternalSquadsRule = item.internalSquads.squads.length > 0
+    const isInternalSquadsAllowOnly = item.internalSquads.mode === INTERNAL_SQUADS_MODE.ALLOW_ONLY
 
     if (isMobile) {
         return (
@@ -143,8 +141,8 @@ export function HostCardWidget(props: IProps) {
                     [classes.selectedItem]: isSelected,
                     [classes.danglingItem]: !configProfile?.uuid
                 })}
-                data-dnd-overlay={isDragOverlay}
-                ref={isDragOverlay ? undefined : setNodeRef}
+                data-drag-overlay={isDragOverlay}
+                ref={isDragOverlay ? undefined : ref}
                 style={style}
             >
                 <Stack gap="sm">
@@ -162,14 +160,15 @@ export function HostCardWidget(props: IProps) {
                                         input: { cursor: 'pointer' }
                                     }}
                                 />
-                                <Box
-                                    {...(isDragOverlay ? {} : attributes)}
-                                    {...(isDragOverlay ? {} : listeners)}
-                                    className={classes.mobileDragHandle}
-                                    onClick={(e) => e.stopPropagation()}
-                                >
-                                    <RiDraggable size={px('1.2rem')} />
-                                </Box>
+                                {!disableReordering && (
+                                    <Box
+                                        className={classes.mobileDragHandle}
+                                        onClick={(e) => e.stopPropagation()}
+                                        ref={isDragOverlay ? undefined : handleRef}
+                                    >
+                                        <RiDraggable size={px('1.2rem')} />
+                                    </Box>
+                                )}
                             </Group>
                         )}
 
@@ -254,10 +253,9 @@ export function HostCardWidget(props: IProps) {
                                     )}
                                 </Badge>
 
-                                <OverflowList
+                                <SingleRowOverflowList
                                     data={item.tags.sort((a, b) => a.localeCompare(b))}
                                     gap={0}
-                                    maxRows={1}
                                     maxVisibleItems={2}
                                     renderItem={(tag) => (
                                         <Badge
@@ -316,21 +314,22 @@ export function HostCardWidget(props: IProps) {
                 [classes.selectedItem]: isSelected,
                 [classes.danglingItem]: !configProfile?.uuid
             })}
-            data-dnd-overlay={isDragOverlay}
-            ref={isDragOverlay ? undefined : setNodeRef}
+            data-drag-overlay={isDragOverlay}
+            ref={isDragOverlay ? undefined : ref}
             style={style}
         >
             <Group gap="md" w="100%" wrap="nowrap">
                 {!viewOnly && (
                     <Group gap="xs" wrap="nowrap">
                         <Checkbox checked={isSelected} onChange={onSelect} size="md" />
-                        <Box
-                            {...(isDragOverlay ? {} : attributes)}
-                            {...(isDragOverlay ? {} : listeners)}
-                            className={classes.dragHandle}
-                        >
-                            <RiDraggable color="white" size="24px" />
-                        </Box>
+                        {!disableReordering && (
+                            <Box
+                                className={classes.dragHandle}
+                                ref={isDragOverlay ? undefined : handleRef}
+                            >
+                                <RiDraggable color="white" size="24px" />
+                            </Box>
+                        )}
                     </Group>
                 )}
 
@@ -404,52 +403,160 @@ export function HostCardWidget(props: IProps) {
                         </Group>
 
                         <Group gap={6} style={{ flexShrink: 0 }} wrap="nowrap">
-                            {hasExcludedSquads && (
-                                <Tooltip label={t('base-host-form.excluded-internal-squads')}>
-                                    <ThemeIcon color="yellow" size={28} variant="soft">
+                            {hasInternalSquadsRule && (
+                                <Tooltip
+                                    label={
+                                        isInternalSquadsAllowOnly
+                                            ? t('base-host-form.allowed-internal-squads')
+                                            : t('base-host-form.excluded-internal-squads')
+                                    }
+                                >
+                                    <ThemeIcon
+                                        color={isInternalSquadsAllowOnly ? 'teal' : 'yellow'}
+                                        size={28}
+                                        variant="soft"
+                                    >
                                         <TbCirclesRelation size={16} />
                                     </ThemeIcon>
                                 </Tooltip>
                             )}
 
                             <Tooltip label={t('base-host-form.xray-json-template')}>
-                                <ThemeIcon
+                                <ActionIcon
                                     color={hasXrayJsonTemplate ? 'teal' : 'gray'}
                                     size={28}
+                                    onClick={(e) => {
+                                        if (!item.xrayJsonTemplateUuid) return
+                                        e.stopPropagation()
+                                        window.open(
+                                            generatePath(
+                                                ROUTES.DASHBOARD.TEMPLATES.TEMPLATE_EDITOR,
+                                                {
+                                                    type: SUBSCRIPTION_TEMPLATE_TYPE.XRAY_JSON,
+                                                    uuid: item.xrayJsonTemplateUuid
+                                                }
+                                            ),
+                                            '_blank'
+                                        )
+                                    }}
                                     variant="soft"
                                 >
                                     <XrayLogo size={16} />
-                                </ThemeIcon>
+                                </ActionIcon>
                             </Tooltip>
 
                             <Tooltip label="Mux">
-                                <ThemeIcon
+                                <ActionIcon
                                     color={hasMuxParams ? 'teal' : 'gray'}
                                     size={28}
                                     variant="soft"
+                                    onClick={(e) => {
+                                        if (!item.muxParams) return
+                                        e.stopPropagation()
+                                        modals.open({
+                                            children: (
+                                                <JsonEditor
+                                                    collapse={3}
+                                                    data={JSON.parse(
+                                                        JSON.stringify(item.muxParams)
+                                                    )}
+                                                    indent={2}
+                                                    maxWidth="100%"
+                                                    rootName=""
+                                                    theme={githubDarkTheme}
+                                                    viewOnly
+                                                />
+                                            ),
+                                            title: (
+                                                <BaseOverlayHeader
+                                                    iconColor="shaded-gray"
+                                                    IconComponent={TbCloudNetwork}
+                                                    iconVariant="soft"
+                                                    title="Mux Params"
+                                                />
+                                            ),
+                                            size: 'xl'
+                                        })
+                                    }}
                                 >
                                     <TbCloudNetwork size={16} />
-                                </ThemeIcon>
+                                </ActionIcon>
                             </Tooltip>
 
                             <Tooltip label="Final Mask">
-                                <ThemeIcon
+                                <ActionIcon
                                     color={hasFinalMask ? 'teal' : 'gray'}
                                     size={28}
                                     variant="soft"
+                                    onClick={(e) => {
+                                        if (!item.finalMask) return
+                                        e.stopPropagation()
+                                        modals.open({
+                                            children: (
+                                                <JsonEditor
+                                                    collapse={3}
+                                                    data={JSON.parse(
+                                                        JSON.stringify(item.finalMask)
+                                                    )}
+                                                    indent={2}
+                                                    maxWidth="100%"
+                                                    rootName=""
+                                                    theme={githubDarkTheme}
+                                                    viewOnly
+                                                />
+                                            ),
+                                            title: (
+                                                <BaseOverlayHeader
+                                                    iconColor="shaded-gray"
+                                                    IconComponent={TbMask}
+                                                    iconVariant="soft"
+                                                    title="Final Mask"
+                                                />
+                                            ),
+                                            size: 'xl'
+                                        })
+                                    }}
                                 >
                                     <TbMask size={16} />
-                                </ThemeIcon>
+                                </ActionIcon>
                             </Tooltip>
 
                             <Tooltip label="SockOpt">
-                                <ThemeIcon
+                                <ActionIcon
                                     color={hasSockoptParams ? 'teal' : 'gray'}
                                     size={28}
                                     variant="soft"
+                                    onClick={(e) => {
+                                        if (!item.sockoptParams) return
+                                        e.stopPropagation()
+                                        modals.open({
+                                            children: (
+                                                <JsonEditor
+                                                    collapse={3}
+                                                    data={JSON.parse(
+                                                        JSON.stringify(item.sockoptParams)
+                                                    )}
+                                                    indent={2}
+                                                    maxWidth="100%"
+                                                    rootName=""
+                                                    theme={githubDarkTheme}
+                                                    viewOnly
+                                                />
+                                            ),
+                                            title: (
+                                                <BaseOverlayHeader
+                                                    iconColor="shaded-gray"
+                                                    IconComponent={PiNetwork}
+                                                    iconVariant="soft"
+                                                    title="SockOpt Params"
+                                                />
+                                            ),
+                                            size: 'xl'
+                                        })
+                                    }}
                                 >
                                     <PiNetwork size={16} />
-                                </ThemeIcon>
+                                </ActionIcon>
                             </Tooltip>
                         </Group>
                     </Group>
@@ -494,10 +601,9 @@ export function HostCardWidget(props: IProps) {
                                 )}
                             </Badge>
 
-                            <OverflowList
+                            <SingleRowOverflowList
                                 data={item.tags.sort((a, b) => a.localeCompare(b))}
                                 gap={0}
-                                maxRows={1}
                                 maxVisibleItems={2}
                                 renderItem={(tag) => (
                                     <Badge
@@ -557,12 +663,11 @@ export function HostCardWidget(props: IProps) {
                         </Group>
 
                         <Group gap="xs" style={{ flexShrink: 0 }} wrap="nowrap">
-                            <OverflowList
+                            <SingleRowOverflowList
                                 data={item.nodes
                                     .map((nodeId) => nodesByUuid.get(nodeId))
                                     .filter((n): n is NonNullable<typeof n> => Boolean(n))}
                                 gap={4}
-                                maxRows={1}
                                 maxVisibleItems={3}
                                 renderItem={(node) => (
                                     <Badge

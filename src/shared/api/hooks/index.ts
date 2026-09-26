@@ -24,11 +24,16 @@ export * from './infra-billing/infra-billing.query.hooks'
 export * from './internal-squads/internal-squads.mutation.hooks'
 export * from './internal-squads/internal-squads.query.hooks'
 
-export * from './ip-control/ip-control.mutation.hooks'
-export * from './ip-control/ip-control.query.hooks'
+export * from './connections/connections.mutation.hooks'
+export * from './connections/connections.query.hooks'
 
 export * from './keys-factory'
+export * from './node-integrations/node-integrations.mutation.hooks'
+export * from './node-integrations/node-integrations.query.hooks'
+
 export * from './node-plugins/node-plugins.mutation.hooks'
+export * from './node-ssh/evaluate-vault'
+export * from './node-ssh/node-ssh.mutation.hooks'
 
 export * from './node-plugins/node-plugins.query.hooks'
 export * from './nodes/nodes.mutation.hooks'
@@ -53,7 +58,6 @@ export * from './subscription-settings/subscription-settings.query.hooks'
 export * from './subscription-template/subscription-template.mutation.hooks'
 export * from './subscription-template/subscription-template.query.hooks'
 
-export * from './system/system.mutation.hooks'
 export * from './system/system.query.hooks'
 
 export * from './users/users.mutation.hooks'
