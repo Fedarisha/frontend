@@ -25,11 +25,39 @@ const FEDARISHA_STORAGE_SCHEMA = {
         prefix: { type: 'string' },
         region: { type: 'string' },
         secretKey: { type: 'string' },
-        sessionsDir: { type: 'string' },
+        sessionsDir: {
+            description: 'Defaults to sessions when empty or null',
+            type: ['string', 'null']
+        },
         type: { type: 'string' }
     },
     title: 'FedarishaStorageConfig',
     type: 'object'
+}
+
+const FEDARISHA_INBOUND_STORAGE_SCHEMA = {
+    ...FEDARISHA_STORAGE_SCHEMA,
+    properties: {
+        ...FEDARISHA_STORAGE_SCHEMA.properties,
+        authType: { enum: ['vkcloud-pak', 'selectel-iam', 'static'], type: 'string' },
+        iam: {
+            additionalProperties: false,
+            properties: {
+                accountId: { type: 'string' },
+                apiUrl: { type: 'string' },
+                identityUrl: { type: 'string' },
+                password: { type: 'string' },
+                projectId: { type: 'string' },
+                projectName: { type: 'string' },
+                username: { type: 'string' }
+            },
+            type: 'object'
+        },
+        masterServiceUserId: {
+            description: 'Selectel IAM ID of the service user that owns accessKey',
+            type: 'string'
+        }
+    }
 }
 
 const FEDARISHA_TUNING_SCHEMA = {
@@ -76,7 +104,7 @@ const FEDARISHA_INBOUND_SETTINGS_SCHEMA = {
             items: FEDARISHA_USER_SCHEMA,
             type: 'array'
         },
-        storage: FEDARISHA_STORAGE_SCHEMA,
+        storage: FEDARISHA_INBOUND_STORAGE_SCHEMA,
         tuning: FEDARISHA_TUNING_SCHEMA,
         userLevel: { minimum: 0, type: 'integer' },
         webhook: FEDARISHA_WEBHOOK_SCHEMA
