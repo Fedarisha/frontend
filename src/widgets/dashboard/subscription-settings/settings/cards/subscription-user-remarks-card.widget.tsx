@@ -1,18 +1,20 @@
-import { PiClockCountdown, PiClockUser, PiListChecks, PiProhibit } from 'react-icons/pi'
-import { UpdateSubscriptionSettingsCommand } from '@remnawave/backend-contract'
-import { TbDevices2, TbListLetters, TbX } from 'react-icons/tb'
+import { CodeHighlight } from '@mantine/code-highlight'
 import { Button, Card, Group, Stack } from '@mantine/core'
-import { zodResolver } from 'mantine-form-zod-resolver'
+import { useForm, schemaResolver } from '@mantine/form'
+import { modals } from '@mantine/modals'
 import { notifications } from '@mantine/notifications'
-import { useTranslation } from 'react-i18next'
-import Masonry from 'react-layout-masonry'
-import { useForm } from '@mantine/form'
+import { UpdateSubscriptionSettingsCommand } from '@remnawave/backend-contract'
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
+import { PiClockCountdown, PiClockUser, PiListChecks, PiProhibit } from 'react-icons/pi'
+import { TbDevices2, TbListLetters, TbX } from 'react-icons/tb'
+import Masonry from 'react-layout-masonry'
 
+import { queryClient } from '@shared/api'
 import { QueryKeys, useUpdateSubscriptionSettings } from '@shared/api/hooks'
+import { BaseOverlayHeader } from '@shared/ui/overlays/base-overlay-header'
 import { SettingsCardShared } from '@shared/ui/settings-card'
 import { handleFormErrors } from '@shared/utils/misc'
-import { queryClient } from '@shared/api'
 
 import { RemarksManager } from './managers/remarks-manager.widget'
 import { computeRemarks } from './subscription-user-remarks.utils'
@@ -57,10 +59,10 @@ export const SubscriptionUserRemarksCardWidget = (props: IProps) => {
         setRemarks((prev) => ({ ...prev, HWIDNotSupported: newRemarks }))
     }
 
-    const form = useForm<UpdateSubscriptionSettingsCommand.Request>({
+    const form = useForm<UpdateSubscriptionSettingsCommand.RequestBody>({
         name: 'subscription-user-remarks-card-form',
         mode: 'uncontrolled',
-        validate: zodResolver(UpdateSubscriptionSettingsCommand.RequestSchema),
+        validate: schemaResolver(UpdateSubscriptionSettingsCommand.RequestBodySchema),
         initialValues: {
             uuid: subscriptionSettings.uuid
         }
@@ -78,6 +80,24 @@ export const SubscriptionUserRemarksCardWidget = (props: IProps) => {
             },
 
             onError(error) {
+                if ((error.cause as unknown as { errorCode: string })?.errorCode === 'A231') {
+                    modals.open({
+                        centered: true,
+                        size: 'auto',
+                        title: (
+                            <BaseOverlayHeader
+                                iconColor="red"
+                                IconComponent={TbX}
+                                iconVariant="soft"
+                                title={t('subscription-settings.widget.validation-error')}
+                            />
+                        ),
+                        children: <CodeHighlight language="json" code={error.message} />
+                    })
+
+                    return
+                }
+
                 handleFormErrors(form, error)
             }
         }
@@ -177,7 +197,7 @@ export const SubscriptionUserRemarksCardWidget = (props: IProps) => {
                                     iconColor="red"
                                     initialRemarks={remarks.expired}
                                     onChange={updateExpiredRemarks}
-                                    title={`${t('subscription-user-remarks-card.widget.user-status')}: EXPIRED`}
+                                    title={`${t('common.field.user-status')}: EXPIRED`}
                                 />
 
                                 <RemarksManager
@@ -185,7 +205,7 @@ export const SubscriptionUserRemarksCardWidget = (props: IProps) => {
                                     iconColor="orange"
                                     initialRemarks={remarks.limited}
                                     onChange={updateLimitedRemarks}
-                                    title={`${t('subscription-user-remarks-card.widget.user-status')}: LIMITED`}
+                                    title={`${t('common.field.user-status')}: LIMITED`}
                                 />
 
                                 <RemarksManager
@@ -193,7 +213,7 @@ export const SubscriptionUserRemarksCardWidget = (props: IProps) => {
                                     iconColor="gray"
                                     initialRemarks={remarks.disabled}
                                     onChange={updateDisabledRemarks}
-                                    title={`${t('subscription-user-remarks-card.widget.user-status')}: DISABLED`}
+                                    title={`${t('common.field.user-status')}: DISABLED`}
                                 />
 
                                 <RemarksManager
@@ -210,8 +230,14 @@ export const SubscriptionUserRemarksCardWidget = (props: IProps) => {
 
                 <SettingsCardShared.Bottom>
                     <Group justify="flex-end">
-                        <Button color="teal" loading={isPending} size="md" type="submit">
-                            {t('common.save')}
+                        <Button
+                            color="teal"
+                            loading={isPending}
+                            size="md"
+                            type="submit"
+                            variant="soft"
+                        >
+                            {t('common.action.save')}
                         </Button>
                     </Group>
                 </SettingsCardShared.Bottom>

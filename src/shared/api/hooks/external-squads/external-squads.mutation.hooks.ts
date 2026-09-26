@@ -1,18 +1,19 @@
+import { notifications } from '@mantine/notifications'
 import {
     AddUsersToExternalSquadCommand,
     CreateExternalSquadCommand,
     DeleteExternalSquadCommand,
     DeleteUsersFromExternalSquadCommand,
     ReorderExternalSquadCommand,
+    SetExternalSquadTagsCommand,
     UpdateExternalSquadCommand
 } from '@remnawave/backend-contract'
-import { notifications } from '@mantine/notifications'
 
 import { createMutationHook } from '../../tsq-helpers'
 
 export const useUpdateExternalSquad = createMutationHook({
     endpoint: UpdateExternalSquadCommand.TSQ_url,
-    bodySchema: UpdateExternalSquadCommand.RequestSchema,
+    bodySchema: UpdateExternalSquadCommand.RequestBodySchema,
     responseSchema: UpdateExternalSquadCommand.ResponseSchema,
     requestMethod: UpdateExternalSquadCommand.endpointDetails.REQUEST_METHOD,
     rMutationParams: {
@@ -36,8 +37,7 @@ export const useUpdateExternalSquad = createMutationHook({
 
 export const useDeleteExternalSquad = createMutationHook({
     endpoint: DeleteExternalSquadCommand.TSQ_url,
-    responseSchema: DeleteExternalSquadCommand.ResponseSchema,
-    routeParamsSchema: DeleteExternalSquadCommand.RequestSchema,
+    routeParamsSchema: DeleteExternalSquadCommand.RequestParamSchema,
     requestMethod: DeleteExternalSquadCommand.endpointDetails.REQUEST_METHOD,
     rMutationParams: {
         onSuccess: () => {
@@ -61,7 +61,7 @@ export const useDeleteExternalSquad = createMutationHook({
 export const useCreateExternalSquad = createMutationHook({
     endpoint: CreateExternalSquadCommand.TSQ_url,
     responseSchema: CreateExternalSquadCommand.ResponseSchema,
-    bodySchema: CreateExternalSquadCommand.RequestSchema,
+    bodySchema: CreateExternalSquadCommand.RequestBodySchema,
     requestMethod: CreateExternalSquadCommand.endpointDetails.REQUEST_METHOD,
     rMutationParams: {
         onSuccess: () => {
@@ -84,8 +84,7 @@ export const useCreateExternalSquad = createMutationHook({
 
 export const useAddUsersToExternalSquad = createMutationHook({
     endpoint: AddUsersToExternalSquadCommand.TSQ_url,
-    responseSchema: AddUsersToExternalSquadCommand.ResponseSchema,
-    routeParamsSchema: AddUsersToExternalSquadCommand.RequestSchema,
+    routeParamsSchema: AddUsersToExternalSquadCommand.RequestParamSchema,
     requestMethod: AddUsersToExternalSquadCommand.endpointDetails.REQUEST_METHOD,
     rMutationParams: {
         onError: (error) => {
@@ -101,8 +100,7 @@ export const useAddUsersToExternalSquad = createMutationHook({
 
 export const useDeleteUsersFromExternalSquad = createMutationHook({
     endpoint: DeleteUsersFromExternalSquadCommand.TSQ_url,
-    responseSchema: DeleteUsersFromExternalSquadCommand.ResponseSchema,
-    routeParamsSchema: DeleteUsersFromExternalSquadCommand.RequestSchema,
+    routeParamsSchema: DeleteUsersFromExternalSquadCommand.RequestParamSchema,
     requestMethod: DeleteUsersFromExternalSquadCommand.endpointDetails.REQUEST_METHOD,
     rMutationParams: {
         onError: (error) => {
@@ -118,13 +116,30 @@ export const useDeleteUsersFromExternalSquad = createMutationHook({
 
 export const useReorderExternalSquads = createMutationHook({
     endpoint: ReorderExternalSquadCommand.TSQ_url,
-    bodySchema: ReorderExternalSquadCommand.RequestSchema,
+    bodySchema: ReorderExternalSquadCommand.RequestBodySchema,
     responseSchema: ReorderExternalSquadCommand.ResponseSchema,
     requestMethod: ReorderExternalSquadCommand.endpointDetails.REQUEST_METHOD,
     rMutationParams: {
         onError: (error) => {
             notifications.show({
                 title: `Reorder External Squads`,
+                message:
+                    error instanceof Error ? error.message : `Request failed with unknown error.`,
+                color: 'red'
+            })
+        }
+    }
+})
+
+export const useSetExternalSquadsTags = createMutationHook({
+    endpoint: SetExternalSquadTagsCommand.TSQ_url,
+    bodySchema: SetExternalSquadTagsCommand.RequestBodySchema,
+    responseSchema: SetExternalSquadTagsCommand.ResponseSchema,
+    requestMethod: SetExternalSquadTagsCommand.endpointDetails.REQUEST_METHOD,
+    rMutationParams: {
+        onError: (error) => {
+            notifications.show({
+                title: 'Update tags',
                 message:
                     error instanceof Error ? error.message : `Request failed with unknown error.`,
                 color: 'red'

@@ -1,25 +1,20 @@
-import { Drawer, em, Group } from '@mantine/core'
-import { useMediaQuery } from '@mantine/hooks'
+import { Box, Group } from '@mantine/core'
+import { ReactNode } from 'react'
+
+import { useIsMobile } from '@shared/hooks'
 
 import styles from './DrawerFooter.module.css'
 
 interface IProps {
-    children: React.ReactNode
+    children: ReactNode
 }
 
 export function DrawerFooter(props: IProps) {
     const { children } = props
-    const isMobile = useMediaQuery(`(max-width: ${em(768)})`)
+    const isMobile = useIsMobile()
 
     return (
-        <Drawer.Header
-            bottom={10}
-            className={styles.modalFooter}
-            component="footer"
-            h="auto"
-            mt="md"
-            pos="sticky"
-        >
+        <Box className={styles.footer} component="footer">
             <Group
                 gap="md"
                 grow={!!isMobile}
@@ -30,6 +25,6 @@ export function DrawerFooter(props: IProps) {
             >
                 {children}
             </Group>
-        </Drawer.Header>
+        </Box>
     )
 }

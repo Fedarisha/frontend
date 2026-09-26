@@ -1,6 +1,6 @@
 import { Button, Center, List, Modal, Stack, Text, ThemeIcon, Title } from '@mantine/core'
-import { TbAlertTriangle, TbCheck } from 'react-icons/tb'
 import { useTranslation } from 'react-i18next'
+import { TbAlertTriangle, TbCheck } from 'react-icons/tb'
 
 import { useMiscStoreActions, useSrrAdvancedModalClosed } from '@entities/dashboard/misc-store'
 
@@ -43,7 +43,7 @@ export function SrrAdvancedWarningOverlay() {
 
                     <Stack align="center" gap="md">
                         <Title c="orange.4" order={2} ta="center">
-                            {t('srr-advanced-warning-overlay.warning')}
+                            {t('common.message.warning')}
                         </Title>
 
                         <Text c="dimmed" fw={500} size="md" ta="center">
@@ -87,7 +87,7 @@ export function SrrAdvancedWarningOverlay() {
                         size="md"
                         variant="light"
                     >
-                        {t('common.continue')}
+                        {t('common.action.continue')}
                     </Button>
                 </Stack>
             </Center>

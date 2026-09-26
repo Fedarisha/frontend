@@ -1,17 +1,17 @@
-import { ForwardRefComponent, HTMLMotionProps, Variants } from 'motion/react'
-import { CreateUserCommand } from '@remnawave/backend-contract'
-import { HiIdentification } from 'react-icons/hi'
-import { UseFormReturnType } from '@mantine/form'
-import { PiUserDuotone } from 'react-icons/pi'
-import { useTranslation } from 'react-i18next'
 import { TextInput } from '@mantine/core'
+import { UseFormReturnType } from '@mantine/form'
+import { CreateUserCommand } from '@remnawave/backend-contract'
+import { ForwardRefComponent, HTMLMotionProps, Variants } from 'motion/react'
+import { useTranslation } from 'react-i18next'
+import { HiIdentification } from 'react-icons/hi'
+import { PiUserDuotone } from 'react-icons/pi'
 
 import { BaseOverlayHeader } from '@shared/ui/overlays/base-overlay-header'
 import { SectionCard } from '@shared/ui/section-card'
 
 interface IProps {
     cardVariants: Variants
-    form: UseFormReturnType<CreateUserCommand.Request>
+    form: UseFormReturnType<CreateUserCommand.RequestBody>
     motionWrapper: ForwardRefComponent<HTMLDivElement, HTMLMotionProps<'div'>>
 }
 
@@ -31,7 +31,7 @@ export const UserIdentityCreationCard = (props: IProps) => {
                         IconComponent={HiIdentification}
                         iconSize={20}
                         iconVariant="soft"
-                        title={t('user-indentity-creation-card.user-identity')}
+                        title={t('user-identity-creation-card.user-identity')}
                         titleOrder={5}
                     />
                 </SectionCard.Section>
@@ -39,7 +39,7 @@ export const UserIdentityCreationCard = (props: IProps) => {
                     <TextInput
                         description={t('create-user-modal.widget.username-cannot-be-changed-later')}
                         key={form.key('username')}
-                        label={t('login-form-feature.username')}
+                        label={t('common.field.username')}
                         required
                         {...form.getInputProps('username')}
                         leftSection={<PiUserDuotone size="16px" />}

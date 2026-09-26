@@ -1,5 +1,5 @@
-import { useTranslation } from 'react-i18next'
 import { Loader, Menu } from '@mantine/core'
+import { useTranslation } from 'react-i18next'
 import { TbRefresh } from 'react-icons/tb'
 
 import { useResetNodeTraffic } from '@shared/api/hooks'
@@ -28,7 +28,7 @@ export function ResetNodeTrafficFeature(props: IProps) {
             }
             onClick={() => resetNodeTraffic({})}
         >
-            {t('reset-node-traffic.feature.reset-traffic')}
+            {t('common.action.reset-traffic')}
         </Menu.Item>
     )
 }

@@ -1,22 +1,30 @@
+import { UseFormReturnType } from '@mantine/form'
 import {
     CreateHostCommand,
-    GetAllNodesCommand,
+    GetHostsTagsCommand,
+    GetNodesCommand,
     GetConfigProfilesCommand,
     GetInternalSquadsCommand,
     GetSubscriptionTemplatesCommand,
-    UpdateHostCommand
+    UpdateHostCommand,
+    UpdateManyHostsCommand
 } from '@remnawave/backend-contract'
-import { UseFormReturnType } from '@mantine/form'
 
-export interface IProps<T extends CreateHostCommand.Request | UpdateHostCommand.Request> {
-    advancedOpened: boolean
+export interface IProps<
+    T extends
+        | CreateHostCommand.RequestBody
+        | UpdateHostCommand.RequestBody
+        | UpdateManyHostsCommand.RequestBody
+> {
     configProfiles: GetConfigProfilesCommand.Response['response']['configProfiles']
     form: UseFormReturnType<T>
-    handleCloneHost?: () => void
     handleSubmit: () => void
+    hostTags: GetHostsTagsCommand.Response['response']['tags']
     internalSquads: GetInternalSquadsCommand.Response['response']['internalSquads']
+    isBulkEdit?: boolean
     isSubmitting: boolean
-    nodes: GetAllNodesCommand.Response['response']
-    setAdvancedOpened: (value: boolean) => void
+    nodes: GetNodesCommand.Response['response']
+    removeRequiredFields?: boolean
     subscriptionTemplates: GetSubscriptionTemplatesCommand.Response['response']['templates']
+    hostUuid?: string
 }

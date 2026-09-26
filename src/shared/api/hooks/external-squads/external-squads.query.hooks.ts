@@ -1,8 +1,9 @@
+import { createQueryKeys } from '@lukemorales/query-key-factory'
 import {
     GetExternalSquadByUuidCommand,
-    GetExternalSquadsCommand
+    GetExternalSquadsCommand,
+    GetExternalSquadsTagsCommand
 } from '@remnawave/backend-contract'
-import { createQueryKeys } from '@lukemorales/query-key-factory'
 import { keepPreviousData } from '@tanstack/react-query'
 
 import { sToMs } from '@shared/utils/time-utils'
@@ -10,10 +11,13 @@ import { sToMs } from '@shared/utils/time-utils'
 import { createGetQueryHook, errorHandler } from '../../tsq-helpers'
 
 export const externalSquadsQueryKeys = createQueryKeys('externalSquads', {
+    getExternalSquadsTags: {
+        queryKey: null
+    },
     getExternalSquads: {
         queryKey: null
     },
-    getExternalSquad: (route: GetExternalSquadByUuidCommand.Request) => ({
+    getExternalSquad: (route: GetExternalSquadByUuidCommand.RequestParam) => ({
         queryKey: [route]
     })
 })
@@ -34,11 +38,22 @@ export const useGetExternalSquads = createGetQueryHook({
 export const useGetExternalSquad = createGetQueryHook({
     endpoint: GetExternalSquadByUuidCommand.TSQ_url,
     responseSchema: GetExternalSquadByUuidCommand.ResponseSchema,
-    routeParamsSchema: GetExternalSquadByUuidCommand.RequestSchema,
+    routeParamsSchema: GetExternalSquadByUuidCommand.RequestParamSchema,
     getQueryKey: ({ route }) => externalSquadsQueryKeys.getExternalSquad(route!).queryKey,
     rQueryParams: {
         refetchOnMount: false,
         staleTime: sToMs(30)
     },
     errorHandler: (error) => errorHandler(error, 'Get External Squad')
+})
+
+export const useGetExternalSquadsTags = createGetQueryHook({
+    endpoint: GetExternalSquadsTagsCommand.TSQ_url,
+    responseSchema: GetExternalSquadsTagsCommand.ResponseSchema,
+    getQueryKey: () => externalSquadsQueryKeys.getExternalSquadsTags.queryKey,
+    rQueryParams: {
+        refetchOnMount: true,
+        staleTime: sToMs(30)
+    },
+    errorHandler: (error) => errorHandler(error, 'Get ExternalSquads Tags')
 })

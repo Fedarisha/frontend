@@ -1,23 +1,23 @@
-import { ForwardRefComponent, HTMLMotionProps, motion, Variants } from 'motion/react'
-import { CreateNodeCommand, UpdateNodeCommand } from '@remnawave/backend-contract'
-import { SiSecurityscorecard } from 'react-icons/si'
-import { UseFormReturnType } from '@mantine/form'
-import { Skeleton, Stack } from '@mantine/core'
-import { useTranslation } from 'react-i18next'
-
 import { ShowConfigProfilesWithInboundsFeature } from '@features/ui/dashboard/nodes/show-config-profiles-with-inbounds'
-import { BaseOverlayHeader } from '@shared/ui/overlays/base-overlay-header'
+import { Skeleton, Stack } from '@mantine/core'
+import { UseFormReturnType } from '@mantine/form'
+import { CreateNodeCommand, UpdateNodeCommand } from '@remnawave/backend-contract'
+import { ForwardRefComponent, HTMLMotionProps, motion, Variants } from 'motion/react'
+import { useTranslation } from 'react-i18next'
+import { SiSecurityscorecard } from 'react-icons/si'
+
 import { useGetConfigProfiles } from '@shared/api/hooks'
+import { BaseOverlayHeader } from '@shared/ui/overlays/base-overlay-header'
 import { SectionCard } from '@shared/ui/section-card'
 
-interface IProps<T extends CreateNodeCommand.Request | UpdateNodeCommand.Request> {
+interface IProps<T extends CreateNodeCommand.RequestBody | UpdateNodeCommand.RequestBody> {
     cardVariants: Variants
     form: UseFormReturnType<T>
     motionWrapper: ForwardRefComponent<HTMLDivElement, HTMLMotionProps<'div'>>
 }
 
 export const NodeConfigProfilesCard = <
-    T extends CreateNodeCommand.Request | UpdateNodeCommand.Request
+    T extends CreateNodeCommand.RequestBody | UpdateNodeCommand.RequestBody
 >(
     props: IProps<T>
 ) => {
@@ -29,20 +29,10 @@ export const NodeConfigProfilesCard = <
     const { data: configProfiles, isLoading: isConfigProfilesLoading } = useGetConfigProfiles()
 
     const saveInbounds = (inbounds: string[], configProfileUuid: string) => {
-        form.setValues({
-            configProfile: {
-                activeInbounds: inbounds,
-                activeConfigProfileUuid: configProfileUuid
-            }
-        } as Partial<T>)
-        form.setTouched({
-            activeConfigProfileUuid: true,
-            activeInbounds: true
-        })
-        form.setDirty({
-            activeConfigProfileUuid: true,
-            activeInbounds: true
-        })
+        form.setFieldValue('configProfile', {
+            activeInbounds: inbounds,
+            activeConfigProfileUuid: configProfileUuid
+        } as never)
     }
 
     return (

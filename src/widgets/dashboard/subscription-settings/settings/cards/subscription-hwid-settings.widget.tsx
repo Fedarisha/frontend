@@ -1,17 +1,16 @@
 import { Button, Group, NumberInput, px, Stack, Switch, Text, Textarea } from '@mantine/core'
+import { useForm, schemaResolver } from '@mantine/form'
 import { UpdateSubscriptionSettingsCommand } from '@remnawave/backend-contract'
-import { PiGear, PiIdentificationBadge } from 'react-icons/pi'
-import { zodResolver } from 'mantine-form-zod-resolver'
 import { useTranslation } from 'react-i18next'
+import { PiGear, PiIdentificationBadge } from 'react-icons/pi'
 import { TbDevices2 } from 'react-icons/tb'
-import { useForm } from '@mantine/form'
-import { Link } from 'react-router-dom'
+import { Link } from 'react-router'
 
+import { queryClient } from '@shared/api'
 import { QueryKeys, useUpdateSubscriptionSettings } from '@shared/api/hooks'
 import { TemplateInfoPopoverShared } from '@shared/ui/popovers'
 import { SettingsCardShared } from '@shared/ui/settings-card'
 import { handleFormErrors } from '@shared/utils/misc'
-import { queryClient } from '@shared/api'
 
 interface IProps {
     subscriptionSettings: UpdateSubscriptionSettingsCommand.Response['response']
@@ -21,10 +20,10 @@ export const SubscriptionHwidSettingsWidget = (props: IProps) => {
     const { subscriptionSettings } = props
     const { t } = useTranslation()
 
-    const form = useForm<UpdateSubscriptionSettingsCommand.Request>({
+    const form = useForm<UpdateSubscriptionSettingsCommand.RequestBody>({
         name: 'subscription-hwid-settings-form',
         mode: 'uncontrolled',
-        validate: zodResolver(UpdateSubscriptionSettingsCommand.RequestSchema),
+        validate: schemaResolver(UpdateSubscriptionSettingsCommand.RequestBodySchema),
         initialValues: {
             uuid: subscriptionSettings.uuid,
             hwidSettings: subscriptionSettings.hwidSettings!
@@ -129,10 +128,16 @@ export const SubscriptionHwidSettingsWidget = (props: IProps) => {
                             variant="light"
                             w="fit-content"
                         >
-                            {t('subscription-hwid-settings.widget.documentation')}
+                            {t('common.action.documentation')}
                         </Button>
-                        <Button color="teal" loading={isPending} size="md" type="submit">
-                            {t('common.save')}
+                        <Button
+                            color="teal"
+                            loading={isPending}
+                            size="md"
+                            type="submit"
+                            variant="soft"
+                        >
+                            {t('common.action.save')}
                         </Button>
                     </Group>
                 </SettingsCardShared.Bottom>

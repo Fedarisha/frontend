@@ -1,3 +1,5 @@
+import { GetBandwidthStatsCommand } from '@remnawave/backend-contract'
+import { TFunction } from 'i18next'
 import {
     PiCalendarDotDuotone,
     PiCalendarDotsDuotone,
@@ -5,8 +7,6 @@ import {
     PiChartDonutDuotone,
     PiChartPieSliceDuotone
 } from 'react-icons/pi'
-import { GetBandwidthStatsCommand } from '@remnawave/backend-contract'
-import { TFunction } from 'i18next'
 
 import { IMetricCardWithTrendProps } from '@shared/ui/metrics/metric-card'
 
@@ -21,7 +21,7 @@ export const getBandwidthMetrics = (
             iconColor: 'blue',
             difference: bandwidthStats.bandwidthLastTwoDays.difference,
             period: t('bandwidth-metrics.from-yesterday'),
-            title: t('bandwidth-metrics.today'),
+            title: t('common.field.today'),
             value: bandwidthStats.bandwidthLastTwoDays.current
         },
         {
@@ -47,7 +47,7 @@ export const getBandwidthMetrics = (
             iconVariant: 'soft',
             iconColor: 'orange',
             difference: bandwidthStats.bandwidthCalendarMonth.difference,
-            period: t('bandwidth-metrics.from-last-month-0'),
+            period: t('bandwidth-metrics.from-last-month'),
             title: t('bandwidth-metrics.calendar-month'),
             value: bandwidthStats.bandwidthCalendarMonth.current
         },

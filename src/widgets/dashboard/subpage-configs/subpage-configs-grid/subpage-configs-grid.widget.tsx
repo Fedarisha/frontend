@@ -1,14 +1,21 @@
-import { useTranslation } from 'react-i18next'
 import { modals } from '@mantine/modals'
+import { useMemo } from 'react'
+import { useTranslation } from 'react-i18next'
 
 import {
     QueryKeys,
-    useCloneSubscriptionPageConfig,
-    useDeleteSubscriptionPageConfig,
-    useReorderSubscriptionPageConfigs
+    useCloneSubpageConfig,
+    useDeleteSubpageConfig,
+    useReorderSubpageConfigs
 } from '@shared/api/hooks'
-import { VirtualizedDndGrid } from '@shared/ui/virtualized-dnd-grid'
 import { queryClient } from '@shared/api/query-client'
+import { filterByTag, TagFilterBar } from '@shared/ui'
+import { VirtualizedDndGrid } from '@shared/ui/virtualized-dnd-grid'
+
+import {
+    useSectionActiveTag,
+    useViewPreferencesStoreActions
+} from '@entities/dashboard/view-preferences-store'
 
 import { SubpageConfigCardWidget } from '../subpage-config-card/subpage-config-card.widget'
 import { IProps } from './interfaces'
@@ -17,31 +24,32 @@ export function SubpageConfigsGridWidget(props: IProps) {
     const { t } = useTranslation()
     const { configs } = props
 
-    const { mutate: deleteSubpageConfig } = useDeleteSubscriptionPageConfig({
+    const activeTag = useSectionActiveTag('subpageConfigs')
+    const { setSectionActiveTag } = useViewPreferencesStoreActions()
+    const visibleItems = useMemo(() => filterByTag(configs ?? [], activeTag), [configs, activeTag])
+
+    const { mutate: deleteSubpageConfig } = useDeleteSubpageConfig({
         mutationFns: {
             onSuccess: () => {
                 queryClient.refetchQueries({
-                    queryKey: QueryKeys.subpageConfigs.getSubscriptionPageConfigs.queryKey
+                    queryKey: QueryKeys.subpageConfigs.getSubpageConfigs.queryKey
                 })
             }
         }
     })
-    const { mutate: reorderSubpageConfigs } = useReorderSubscriptionPageConfigs({
+    const { mutate: reorderSubpageConfigs } = useReorderSubpageConfigs({
         mutationFns: {
             onSuccess: (data) => {
-                queryClient.setQueryData(
-                    QueryKeys.subpageConfigs.getSubscriptionPageConfigs.queryKey,
-                    data
-                )
+                queryClient.setQueryData(QueryKeys.subpageConfigs.getSubpageConfigs.queryKey, data)
             }
         }
     })
 
-    const { mutate: cloneSubpageConfig } = useCloneSubscriptionPageConfig({
+    const { mutate: cloneSubpageConfig } = useCloneSubpageConfig({
         mutationFns: {
             onSuccess: () => {
                 queryClient.refetchQueries({
-                    queryKey: QueryKeys.subpageConfigs.getSubscriptionPageConfigs.queryKey
+                    queryKey: QueryKeys.subpageConfigs.getSubpageConfigs.queryKey
                 })
             }
         }
@@ -49,14 +57,14 @@ export function SubpageConfigsGridWidget(props: IProps) {
 
     const handleDeleteSubpageConfig = (subpageConfigUuid: string) => {
         modals.openConfirmModal({
-            title: t('common.confirm-action'),
-            children: t('common.confirm-action-description'),
+            title: t('common.action.confirm-action'),
+            children: t('common.message.confirm-action-description'),
             labels: {
-                confirm: t('common.delete'),
-                cancel: t('common.cancel')
+                confirm: t('common.action.delete'),
+                cancel: t('common.action.cancel')
             },
-            cancelProps: { variant: 'subtle', color: 'gray' },
-            confirmProps: { color: 'red' },
+            cancelProps: { variant: 'subtle' },
+            confirmProps: { color: 'red', variant: 'soft' },
             centered: true,
             onConfirm: () => {
                 deleteSubpageConfig({
@@ -89,8 +97,15 @@ export function SubpageConfigsGridWidget(props: IProps) {
 
     return (
         <VirtualizedDndGrid
-            enableDnd={true}
-            items={configs}
+            enableDnd={activeTag === null}
+            header={
+                <TagFilterBar
+                    activeTag={activeTag}
+                    items={configs}
+                    onChange={(tag) => setSectionActiveTag('subpageConfigs', tag)}
+                />
+            }
+            items={visibleItems}
             key={`subpage-configs-grid-widget`}
             onReorder={handleReorder}
             renderDragOverlay={(subpageConfig) => (
@@ -103,6 +118,7 @@ export function SubpageConfigsGridWidget(props: IProps) {
             )}
             renderItem={(subpageConfig) => (
                 <SubpageConfigCardWidget
+                    disableReordering={activeTag !== null}
                     handleCloneSubpageConfig={handleCloneSubpageConfig}
                     handleDeleteSubpageConfig={handleDeleteSubpageConfig}
                     subpageConfig={subpageConfig}

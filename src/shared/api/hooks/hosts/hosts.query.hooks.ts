@@ -1,5 +1,5 @@
-import { GetAllHostsCommand, GetAllHostTagsCommand } from '@remnawave/backend-contract'
 import { createQueryKeys } from '@lukemorales/query-key-factory'
+import { GetHostCommand, GetHostsCommand, GetHostsTagsCommand } from '@remnawave/backend-contract'
 
 import { sToMs } from '@shared/utils/time-utils'
 
@@ -11,12 +11,15 @@ export const hostsQueryKeys = createQueryKeys('hosts', {
     },
     getAllTags: {
         queryKey: null
-    }
+    },
+    getHost: (route: GetHostCommand.RequestParam) => ({
+        queryKey: [route]
+    })
 })
 
 export const useGetHosts = createGetQueryHook({
-    endpoint: GetAllHostsCommand.TSQ_url,
-    responseSchema: GetAllHostsCommand.ResponseSchema,
+    endpoint: GetHostsCommand.TSQ_url,
+    responseSchema: GetHostsCommand.ResponseSchema,
     getQueryKey: () => hostsQueryKeys.getAllHosts.queryKey,
     rQueryParams: {
         refetchOnMount: true
@@ -25,8 +28,8 @@ export const useGetHosts = createGetQueryHook({
 })
 
 export const useGetHostTags = createGetQueryHook({
-    endpoint: GetAllHostTagsCommand.TSQ_url,
-    responseSchema: GetAllHostTagsCommand.ResponseSchema,
+    endpoint: GetHostsTagsCommand.TSQ_url,
+    responseSchema: GetHostsTagsCommand.ResponseSchema,
     getQueryKey: () => hostsQueryKeys.getAllTags.queryKey,
     rQueryParams: {
         refetchOnMount: true,
@@ -35,4 +38,13 @@ export const useGetHostTags = createGetQueryHook({
         placeholderData: false
     },
     errorHandler: (error) => errorHandler(error, 'Get All Host Tags')
+})
+
+export const useGetHost = createGetQueryHook({
+    endpoint: GetHostCommand.TSQ_url,
+    responseSchema: GetHostCommand.ResponseSchema,
+    routeParamsSchema: GetHostCommand.RequestParamSchema,
+    getQueryKey: ({ route }) => hostsQueryKeys.getHost(route!).queryKey,
+    rQueryParams: {},
+    errorHandler: (error) => errorHandler(error, 'Get Host')
 })

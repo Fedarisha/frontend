@@ -1,7 +1,7 @@
-import { TSubscriptionPageRawConfig } from '@remnawave/subscription-page-types'
 import { Card, Divider, Stack, TextInput } from '@mantine/core'
-import { IconPalette } from '@tabler/icons-react'
 import { UseFormReturnType } from '@mantine/form'
+import { TSubscriptionPageRawConfig } from '@remnawave/subscription-page-types'
+import { IconPalette } from '@tabler/icons-react'
 import { useTranslation } from 'react-i18next'
 
 import { BaseOverlayHeader } from '@shared/ui/overlays/base-overlay-header'
@@ -42,7 +42,7 @@ export function BrandingBlockComponent({ form }: IProps) {
                 <TextInput
                     classNames={{ input: styles.inputDark }}
                     key={form.key('brandingSettings.logoUrl')}
-                    label={t('subpage-config-visual-editor.widget.logo-url')}
+                    label={t('common.field.logo-url')}
                     placeholder="https://example.com/logo.png"
                     required
                     {...form.getInputProps('brandingSettings.logoUrl')}
